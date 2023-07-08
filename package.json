@@ -1,0 +1,19 @@
+{
+  "name": "tetris_game",
+  "version": "1.0.0",
+  "description": "Tetris game made using Phaser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Peter Kovac",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7",
+    "phaser": "^3.60.0",
+    "supervisor": "^0.12.0"
+  }
+}
