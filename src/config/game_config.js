@@ -17,4 +17,10 @@ const calculateRectSize = config => {
     config.rectHeight = config.gameHeight / config.numRows;
 }
 
+const calculateSidebarSize = config => {
+    config.sidebarWidth = windowWidth - config.gameWidth;
+    config.sidebarHeight = windowHeight;
+}
+
 calculateRectSize(gameConfig);
+calculateSidebarSize(gameConfig);
