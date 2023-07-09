@@ -11,6 +11,7 @@ export default new Phaser.Game({
     width: windowWidth,
     height: windowHeight,
     scene: [Game],
+    fps: 10,
     physics: {
         default: 'arcade',
         arcade: {

@@ -1,6 +1,15 @@
 import * as colors from './colors.js';
 
 export default class Sidebar extends Phaser.GameObjects.Container {
+    /**
+     * 
+     * @param {Phaser.Scene} scene
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {number} color 
+     */
     constructor(scene, x, y, width, height, color) {
         super(scene, x, y);
         this.scene = scene
