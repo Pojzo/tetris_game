@@ -6,6 +6,7 @@ import { windowConfig } from '../config/window_config.js';
 
 import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
+import Grid from '../game/Grid.js';
 
 const gameFPS = 1;
 const keyFPS = 8;
@@ -23,13 +24,14 @@ export default class Game extends Phaser.Scene {
         this.rightDown = false;
         this.topDown = false;
         this.bottomDown = false;
+
+        this.grid = new Grid(this, gameConfig.numRows, gameConfig.numCols);
     }
     preload() {
         this.load.image('background', '../assets/background.png')
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
-        console.log(gameConfig, windowConfig);
         const [windowWidth, windowHeight] = [windowConfig.windowWidth, windowConfig.windowHeight];
         const [sidebarWidth, sidebarHeight] = [gameConfig.sidebarWidth, gameConfig.sidebarHeight];
 
@@ -55,8 +57,12 @@ export default class Game extends Phaser.Scene {
         this.handleKeys();
 
         if (this.frameTime > this.gameDelay) {
-            this.activeShape.moveDown();
-            this.neyBuffer = null;
+            if (!this.activeShape.moveDown(this.grid.array)) {
+                console.log("New shape");
+                this.addShapeToGrid(this.activeShape);
+                this.activeShape = new Shape(this, 0, 0, 'Z');
+            }
+            this.keyBuffer = null;
             this.frameTime = 0;
         }
 
@@ -104,20 +110,32 @@ export default class Game extends Phaser.Scene {
      */
     shapeHorizontalMovement(shape) {
         if (this.leftDown) {
-            console.log("Moving left");
-            shape.moveLeft();
+            shape.moveLeft(this.grid.array);
         }
         else if (this.rightDown) {
-            shape.moveRight();
+            shape.moveRight(this.grid.array);
         }
     }
     /**
      * @brief Rotate the shape clockwise - top key, anticlockwise - left key
-     * @param {shape} shape 
+     * @param {Shape} shape 
      */
     shapeRotate(shape) {
         if (this.topDown) {
             shape.rotateRight();
         }
+    }
+    /**
+     * @brief Add shape to the grid array. Take each rect contained within the shape and add it to the grid as a 1
+     *        at the desired coordinates
+     * @param {Shape} shape 
+     */
+    addShapeToGrid(shape) {
+        shape.rects.forEach(rect => {
+            const coordX = rect.coordX;
+            const coordY = rect.coordY;
+            this.grid.addToGrid(rect, coordX, coordY);
+        })
+        shape.rects = [];
     }
 }

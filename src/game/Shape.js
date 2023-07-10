@@ -38,7 +38,7 @@ export default class Shape {
         try {
             this.shapeTransformations = shapes[this.shapeCode];
         }
-        catch (err){
+        catch (err) {
             console.error("Invalid shape");
             console.log(err);
             return null;
@@ -47,7 +47,6 @@ export default class Shape {
 
         const rows = curTransformation.length;
         const cols = curTransformation[0].length;
-        console.log(curTransformation, this.transformationIndex);
 
         let skipX;
         let skipY = 0;
@@ -68,9 +67,6 @@ export default class Shape {
             }
             skipY += this.rectHeight;
         }
-        this.rects.forEach(rect => {
-            console.log(rect.coordX, rect.coordY);
-        })
         this.scene.add.existing(this.rects);
     }
     /**
@@ -85,13 +81,14 @@ export default class Shape {
     }
     /**
      * 
-     * @param {Shape[]} otherShapes - An array of Shape class objects
+     * @param {Array[]} gridArray - 
      * @return {boolean} True if the shape was able to move down by one row
      * @brief Try to move the shape down. If it's not possible due to other shape being present below
      *        the shape, return false
      */
-    moveDown(otherShapes) {
-        if (this.isAtBottom()) {
+    moveDown(gridArray) {
+        console.log(gridArray);
+        if (this.isAtBottom() || this.detectCollision(gridArray, 0, 1)) {
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -100,14 +97,15 @@ export default class Shape {
             rect.coordY += 1;
         }
         this.originCoordY += 1;
+        return true;
     }
     /**
      * 
      * @brief If possible, move the shape to the left
      * @returns False if it wasn't possible for the shape to move left
      */
-    moveLeft() {
-        if (!this.canMoveLeft()) {
+    moveLeft(gridArray) {
+        if (!this.canMoveLeft() || this.isAtBottom() || this.detectCollision(gridArray, -1, 0)) {
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -117,13 +115,14 @@ export default class Shape {
         }
 
         this.originCoordX -= 1;
+        return true;
     }
     /**
      * @brief If possible, move the shape to the right
      * @returns False if it wasn't possible for the shape to move right
      */
-    moveRight() {
-        if (!this.canMoveRight()) {
+    moveRight(gridArray) {
+        if (!this.canMoveRight() || this.isAtBottom() || this.detectCollision(gridArray, 1, 0)) {
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -132,28 +131,21 @@ export default class Shape {
             rect.coordX += 1;
         }
         this.originCoordX += 1;
+        return true;
     }
     /**
-     * @brief If possible, rotate the shape to the left
-     */
-    rotateLeft() {
-        if (this.transformationIndex == 0) {
-            this.transformationIndex = 3;
-        }
-        else {
-            this.transformationIndex -= 1;
-        }
-           }
-    /**
-     * 
-     * @brief If possible, rotate the shape to the right
-     */
+  * 
+  * @brief If possible, rotate the shape to the right
+  */
     rotateRight() {
+        if (this.isAtBottom()) {
+            return;
+        }
         if (this.transformationIndex == 3) {
             this.transformationIndex = 0;
         }
         else {
-            this.transformationIndex += 1 ;
+            this.transformationIndex += 1;
         }
 
         const topLeftMost = this.getTopLeftMostRect();
@@ -179,6 +171,23 @@ export default class Shape {
                 return true;
             }
         }
+        return false;
+    }
+    /**
+     * 
+     * @param {Array[]} gridArray - 2D array representing the grid - 1 means it's occupied, 0 that it's vacant
+     * @param {number} dX - Change in the horizontal position of the shape
+     * @param {number} dY - Change in the vertical position of the shape
+     * @returns True if there is a collision that is due on the next move
+     */
+    detectCollision(gridArray, dX, dY) {
+        this.rects.forEach(rect => {
+            const newCoordX = rect.coordX + dX;
+            const newCoordY = rect.coordY + dY;
+            if (gridArray[newCoordY][newCoordX] === 1) {
+                return true;
+            }
+        })
         return false;
     }
     /**
