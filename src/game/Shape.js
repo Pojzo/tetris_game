@@ -11,9 +11,10 @@ export default class Shape {
      * @param {number} y 
      * @param {string} shapeCode 
      */
-    constructor(scene, x, y, shapeCode) {
-        this.shapeCode = shapeCode;
+    constructor(scene, x, y, shapeCode, color) {
         this.scene = scene;
+        this.shapeCode = shapeCode;
+        this.color = color;
 
         this.rectWidth = gameConfig.rectWidth;
         this.rectHeight = gameConfig.rectHeight;
@@ -61,7 +62,7 @@ export default class Shape {
                     skipX += this.rectWidth;
                     continue;
                 }
-                const rect = new ShapeRect(this.scene, offsetX + skipX, offsetY + skipY, this.originCoordX + j, this.originCoordY + i, this.rectWidth, this.rectHeight, colors.COLOR_RED).setOrigin(0, 0);
+                const rect = new ShapeRect(this.scene, offsetX + skipX, offsetY + skipY, this.originCoordX + j, this.originCoordY + i, this.rectWidth, this.rectHeight, this.color).setOrigin(0, 0);
                 this.rects.push(rect);
                 skipX += this.rectWidth;
             }
@@ -87,8 +88,14 @@ export default class Shape {
      *        the shape, return false
      */
     moveDown(gridArray) {
-        console.log(gridArray);
-        if (this.isAtBottom() || this.detectCollision(gridArray, 0, 1)) {
+        const atBottom = this.isAtBottom();
+
+        if (atBottom) {
+            return false;
+        }
+        const collision = this.detectCollision(gridArray, 0, 1);
+        if (collision === true) {
+            console.log("Collision at", this.originCoordX, this.originCoordY);
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -181,13 +188,16 @@ export default class Shape {
      * @returns True if there is a collision that is due on the next move
      */
     detectCollision(gridArray, dX, dY) {
-        this.rects.forEach(rect => {
+        for (let i = 0; i < this.rects.length; i++) {
+            const rect = this.rects[i];
             const newCoordX = rect.coordX + dX;
             const newCoordY = rect.coordY + dY;
-            if (gridArray[newCoordY][newCoordX] === 1) {
-                return true;
+            if (newCoordY < gameConfig.numRows) {
+                if (gridArray[newCoordY][newCoordX] === 1) {
+                    return true;
+                }
             }
-        })
+        }
         return false;
     }
     /**

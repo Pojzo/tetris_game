@@ -17,6 +17,7 @@ export default class ShapeRect extends Phaser.GameObjects.Rectangle {
 
         this.coordX = coordX;
         this.coordY = coordY;
+        this.setStrokeStyle(3);
 
         return this;
     }

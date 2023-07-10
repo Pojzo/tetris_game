@@ -1,3 +1,6 @@
+export const pieceStrings = ['I', 'J', 'L', 'O', 'S', 'T'];
+export const pieceColors = ['00ffff', 'ffff00', '800080', '00ff00', 'ff0000', '0000ff', 'ff7f00', '7f7f7f'];
+
 export const I = [
 	[
 		[0, 0, 0, 0],

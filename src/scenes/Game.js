@@ -1,5 +1,5 @@
-import * as pieces from '../game/shapes.js';
 import * as colors from '../game/colors.js';
+import { pieceColors, pieceStrings } from '../game/shapes.js';
 
 import { gameConfig } from '../config/game_config.js';
 import { windowConfig } from '../config/window_config.js';
@@ -8,7 +8,7 @@ import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
-const gameFPS = 1;
+const gameFPS = 4;
 const keyFPS = 8;
 
 export default class Game extends Phaser.Scene {
@@ -43,7 +43,7 @@ export default class Game extends Phaser.Scene {
         this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_YELLOW);
 
         this.shapes = [];
-        this.activeShape = new Shape(this, 0, 0, 'Z');
+        this.createNewShape();
     }
     /**
      * 
@@ -60,7 +60,7 @@ export default class Game extends Phaser.Scene {
             if (!this.activeShape.moveDown(this.grid.array)) {
                 console.log("New shape");
                 this.addShapeToGrid(this.activeShape);
-                this.activeShape = new Shape(this, 0, 0, 'Z');
+                this.createNewShape();
             }
             this.keyBuffer = null;
             this.frameTime = 0;
@@ -137,5 +137,30 @@ export default class Game extends Phaser.Scene {
             this.grid.addToGrid(rect, coordX, coordY);
         })
         shape.rects = [];
+    }
+    /**
+     * @brief Create new randomly selected shape and place it on the top level at random x coordinate
+     */
+    createNewShape() {
+        const startX = Math.random() * gameConfig.numCols - 2;
+        const pieceCode = this.getRandomPiece();
+        const pieceColor = this.getRandomColor();
+
+        const convertedPieceColor = colors.convertHexToColor(pieceColor);
+
+        this.activeShape = new Shape(this, startX, 0, pieceCode, convertedPieceColor);
+    }
+    /**
+     * 
+     * @returns {string} Randomly selected string representing a shape
+     */
+    getRandomPiece() {
+        return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
+    }
+    /**
+     * @returns {number} Randomly selected color for the shape
+     */
+    getRandomColor() {
+        return pieceColors[Math.floor(Math.random() * pieceColors.length)];
     }
 }
