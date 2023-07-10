@@ -7,8 +7,8 @@ import { windowConfig } from '../config/window_config.js';
 import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
 
-const gameFPS = 2;
-const keyFPS = 10;
+const gameFPS = 1;
+const keyFPS = 8;
 
 export default class Game extends Phaser.Scene {
     constructor() {
@@ -41,7 +41,7 @@ export default class Game extends Phaser.Scene {
         this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_YELLOW);
 
         this.shapes = [];
-        this.activeShape = new Shape(this, 0, 0, 'L');
+        this.activeShape = new Shape(this, 0, 0, 'Z');
     }
     /**
      * 
@@ -56,7 +56,6 @@ export default class Game extends Phaser.Scene {
 
         if (this.frameTime > this.gameDelay) {
             this.activeShape.moveDown();
-            this.resetKeys();
             this.neyBuffer = null;
             this.frameTime = 0;
         }
@@ -65,8 +64,8 @@ export default class Game extends Phaser.Scene {
             this.shapeHorizontalMovement(this.activeShape);
             this.shapeRotate(this.activeShape);
             this.keyFrameTime = 0;
+            this.resetKeys();
         }
-
     }
 
     /**
@@ -83,10 +82,10 @@ export default class Game extends Phaser.Scene {
         }
         if (this.cursorKeys.up.isDown) {
             this.bottomDown = false;
-            this.upDown = true;
+            this.topDown = true;
         }
         if (this.cursorKeys.down.isDown) {
-            this.upDown = false;
+            this.topDown = false;
             this.bottomDown = true;
         }
     }
@@ -105,6 +104,7 @@ export default class Game extends Phaser.Scene {
      */
     shapeHorizontalMovement(shape) {
         if (this.leftDown) {
+            console.log("Moving left");
             shape.moveLeft();
         }
         else if (this.rightDown) {
@@ -118,9 +118,6 @@ export default class Game extends Phaser.Scene {
     shapeRotate(shape) {
         if (this.topDown) {
             shape.rotateRight();
-        }
-        else if (this.bottomDown) {
-            shape.rotateLeft();
         }
     }
 }

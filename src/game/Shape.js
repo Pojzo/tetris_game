@@ -44,27 +44,33 @@ export default class Shape {
             return null;
         }
         const curTransformation = this.shapeTransformations[this.transformationIndex];
+
         const rows = curTransformation.length;
         const cols = curTransformation[0].length;
+        console.log(curTransformation, this.transformationIndex);
 
-        let skipX = 0;
-        let skipY;
+        let skipX;
+        let skipY = 0;
 
         const offsetX = gridOffsetX * this.rectWidth;
         const offsetY = gridOffsetY * this.rectHeight;
-        for (let j = 0; j < cols; j++) {
-            skipY = 0;
-            for (let i = 0; i < rows; i++) {
+
+        for (let i = 0; i < rows; i++) {
+            skipX = 0;
+            for (let j = 0; j < cols; j++) {
                 if (curTransformation[i][j] == 0) {
+                    skipX += this.rectWidth;
                     continue;
                 }
-                const rect = new ShapeRect(this.scene, offsetX + skipX, offsetY + skipY, j, i, this.rectWidth, this.rectHeight, colors.COLOR_RED).setOrigin(0, 0);
+                const rect = new ShapeRect(this.scene, offsetX + skipX, offsetY + skipY, this.originCoordX + j, this.originCoordY + i, this.rectWidth, this.rectHeight, colors.COLOR_RED).setOrigin(0, 0);
                 this.rects.push(rect);
-                skipY += this.rectHeight;
+                skipX += this.rectWidth;
             }
-            skipX += this.rectWidth;
+            skipY += this.rectHeight;
         }
-        console.log(this.rects);
+        this.rects.forEach(rect => {
+            console.log(rect.coordX, rect.coordY);
+        })
         this.scene.add.existing(this.rects);
     }
     /**
@@ -137,14 +143,7 @@ export default class Shape {
         else {
             this.transformationIndex -= 1;
         }
-        const topLeftMost = this.getTopLeftMostRect();
-
-        const x = topLeftMost.x;
-        const y = topLeftMost.y;
-        this.destroyShape();
-
-        this.buildShape(this.originCoordX, this.originCoordY);
-    }
+           }
     /**
      * 
      * @brief If possible, rotate the shape to the right
@@ -153,6 +152,17 @@ export default class Shape {
         if (this.transformationIndex == 3) {
             this.transformationIndex = 0;
         }
+        else {
+            this.transformationIndex += 1 ;
+        }
+
+        const topLeftMost = this.getTopLeftMostRect();
+
+        const x = topLeftMost.x;
+        const y = topLeftMost.y;
+        this.destroyShape();
+
+        this.buildShape(this.originCoordX, this.originCoordY);
     }
     /**
      * 
