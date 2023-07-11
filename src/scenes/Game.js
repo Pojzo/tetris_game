@@ -8,7 +8,7 @@ import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
-const gameFPS = 8;
+const gameFPS = 2;
 const keyFPS = 12;
 
 const gameStates = {
@@ -30,7 +30,6 @@ export default class Game extends Phaser.Scene {
         this.topDown = false;
         this.bottomDown = false;
 
-
         this.grid = new Grid(this, gameConfig.numRows, gameConfig.numCols);
     }
     preload() {
@@ -50,7 +49,15 @@ export default class Game extends Phaser.Scene {
 
         this.shapes = [];
         this.createNewShape();
-        this.input.keyboard.on('keydown-SPACE', this.handlePause);
+
+        // this.controller = new Controller(this);
+        // this.controller.registerKeys(this.handleKeys);
+
+        this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
+        this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
+        this.input.keyboard.on('keydown-DOWN', () => this.handleKeys('down'), this);
+        this.input.keyboard.on('keydown-LEFT', () => this.handleKeys('left'), this);
+        this.input.keyboard.on('keydown-RIGHT', () => this.handleKeys('right'), this);
 
         this.gameState = 0;
     }
@@ -64,7 +71,6 @@ export default class Game extends Phaser.Scene {
         if (this.gameState === 1) {
             return;
         }
-        this.handleKeys();
         this.updateVerticalMovement(time, delta);
         this.updateHorizontalMovement(time, delta);
     }
@@ -79,7 +85,6 @@ export default class Game extends Phaser.Scene {
         this.frameTime += delta;
         if (this.frameTime > this.gameDelay) {
             if (!this.activeShape.moveDown(this.grid.array)) {
-                console.log("New shape");
                 this.addShapeToGrid(this.activeShape);
                 this.createNewShape();
                 this.handleTetris();
@@ -101,45 +106,32 @@ export default class Game extends Phaser.Scene {
      * @param {number} delta 
      */
     updateHorizontalMovement(time, delta) {
+        /*
         this.keyFrameTime += delta;
         if (this.keyFrameTime > this.keyDelay) {
             this.shapeHorizontalMovement(this.activeShape);
             this.shapeRotate(this.activeShape);
             this.keyFrameTime = 0;
         }
+        */
     }
 
     /**
      * @brief Handle key presses, make sure the last key press is registered
+     * @param {string} key - String representation of the key that was pressed
      */
-    handleKeys() {
-        if (this.cursorKeys.left.isDown) {
-            this.rightDown = false;
-            this.leftDown = true;
-        }
-        else {
-            this.leftDown = false;
-        }
-        if (this.cursorKeys.right.isDown) {
-            this.leftDown = false;
-            this.rightDown = true;
-        }
-        else {
-            this.rightDown = false;
-        }
-        if (this.cursorKeys.up.isDown) {
-            this.bottomDown = false;
-            this.topDown = true;
-        }
-        else {
-            this.topDown = false;
-        }
-        if (this.cursorKeys.down.isDown) {
-            this.topDown = false;
-            this.bottomDown = true;
-        }
-        else {
-            this.bottomDown = false;
+    handleKeys(key) {
+        console.log("called with", key);
+        switch (key) {
+            case 'left':
+                this.activeShape.moveLeft(this.grid.array);
+                break;
+            case 'right':
+                this.activeShape.moveRight(this.grid.array);
+                break;
+            case 'up':
+                this.activeShape.rotateRight(this.grid.array);
+                break;
         }
     }
     /**
@@ -229,9 +221,22 @@ export default class Game extends Phaser.Scene {
     handlePause() {
         if (this.gameState === gameStates.running) {
             this.gameState = gameStates.paused;
-            console.log("Should be paused", this.gameState);
             return;
         }
         this.gameState = gameStates.running;
+    }
+}
+
+class Controller {
+    constructor(context) {
+        this.context = context;
+    }
+    registerKeys(callback) {
+        this.input.keyboard.on('keydown-SPACE', () => callback('space'));
+        this.input.keyboard.on('keydown-SPACE', () => callback('space'));
+        this.input.keyboard.on('keydown-UP', () => callback('up'));
+        this.input.keyboard.on('keydown-DOWN', () => callback('down'));
+        this.input.keyboard.on('keydown-LEFT', () => callback('left'));
+        this.input.keyboard.on('keydown-RIGHT', () => callback('right'));
     }
 }

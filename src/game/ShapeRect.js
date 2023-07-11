@@ -24,7 +24,5 @@ export default class ShapeRect extends Phaser.GameObjects.Rectangle {
     updatePosition() {
         this.x = this.coordX * this.width;
         this.y = this.coordY * this.height;
-
-        console.log(this.x, this.y, this.coordX * this.width, this.coordY * this.height, this.coordX, this.coordY);
     }
 }
