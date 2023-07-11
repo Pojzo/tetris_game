@@ -6,10 +6,10 @@ import ShapeRect from './ShapeRect.js';
 export default class Shape {
     /**
      * 
-     * @param {Phaser.Scene} scene 
-     * @param {number} x 
-     * @param {number} y 
-     * @param {string} shapeCode 
+     * @param {Phaser.Scene} scene - Phaser.Scene object
+     * @param {number} x - Horizontal position in the grid
+     * @param {number} y - Vertical position in the grid
+     * @param {string} shapeCode - String representation of the shape
      */
     constructor(scene, x, y, shapeCode, color) {
         this.scene = scene;
@@ -22,12 +22,12 @@ export default class Shape {
         this.transformationIndex = 0;
 
         // store the coordinates of the top left of the piece matrix
-        this.originCoordX = 0;
-        this.originCoordY = 0;
+        this.originCoordX = x;
+        this.originCoordY = y;
 
         this.rects = []
 
-        this.buildShape(0, 0);
+        this.buildShape(this.originCoordX, this.originCoordY);
     }
     /**
      * 
@@ -82,18 +82,18 @@ export default class Shape {
     }
     /**
      * 
-     * @param {Array[]} gridArray - 
+     * @param {Array[]} gridMatrix - 
      * @return {boolean} True if the shape was able to move down by one row
      * @brief Try to move the shape down. If it's not possible due to other shape being present below
      *        the shape, return false
      */
-    moveDown(gridArray) {
+    moveDown(gridMatrix) {
         const atBottom = this.isAtBottom();
 
         if (atBottom) {
             return false;
         }
-        const collision = this.detectCollision(gridArray, 0, 1);
+        const collision = this.detectCollision(gridMatrix, 0, 1);
         if (collision === true) {
             console.log("Collision at", this.originCoordX, this.originCoordY);
             return false;
@@ -111,8 +111,8 @@ export default class Shape {
      * @brief If possible, move the shape to the left
      * @returns False if it wasn't possible for the shape to move left
      */
-    moveLeft(gridArray) {
-        if (!this.canMoveLeft() || this.isAtBottom() || this.detectCollision(gridArray, -1, 0)) {
+    moveLeft(gridMatrix) {
+        if (!this.canMoveLeft() || this.isAtBottom() || this.detectCollision(gridMatrix, -1, 0)) {
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -128,8 +128,8 @@ export default class Shape {
      * @brief If possible, move the shape to the right
      * @returns False if it wasn't possible for the shape to move right
      */
-    moveRight(gridArray) {
-        if (!this.canMoveRight() || this.isAtBottom() || this.detectCollision(gridArray, 1, 0)) {
+    moveRight(gridMatrix) {
+        if (!this.canMoveRight() || this.isAtBottom() || this.detectCollision(gridMatrix, 1, 0)) {
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -144,9 +144,12 @@ export default class Shape {
   * 
   * @brief If possible, rotate the shape to the right
   */
-    rotateRight() {
+    rotateRight(gridMatrix) {
         if (this.isAtBottom()) {
             return;
+        }
+        if (this.detectCollisionAfterRotation(gridMatrix)) {
+            return false;
         }
         if (this.transformationIndex == 3) {
             this.transformationIndex = 0;
@@ -182,21 +185,55 @@ export default class Shape {
     }
     /**
      * 
-     * @param {Array[]} gridArray - 2D array representing the grid - 1 means it's occupied, 0 that it's vacant
+     * @param {Array[]} gridMatrix - 2D array representing the grid - 1 means it's occupied, 0 that it's vacant
      * @param {number} dX - Change in the horizontal position of the shape
      * @param {number} dY - Change in the vertical position of the shape
      * @returns True if there is a collision that is due on the next move
      */
-    detectCollision(gridArray, dX, dY) {
+    detectCollision(gridMatrix, dX, dY) {
         for (let i = 0; i < this.rects.length; i++) {
             const rect = this.rects[i];
             const newCoordX = rect.coordX + dX;
             const newCoordY = rect.coordY + dY;
             if (newCoordY < gameConfig.numRows) {
-                if (gridArray[newCoordY][newCoordX] === 1) {
+                if (gridMatrix[newCoordY][newCoordX] === 1) {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+    /**
+     * 
+     * @param {Array[]} gridMatrix - 2D array representing the grid - 1 means it's occupied, 0 that it's vacant
+     * @returns True if there is no collision with other pieces after applying rotation
+     */
+    detectCollisionAfterRotation(gridMatrix) {
+        const nextTransformationIndex = this.transformationIndex == 3 ? 0 : this.transformationIndex + 1;
+        const nextTransformation = this.shapeTransformations[nextTransformationIndex];
+
+        const cols = nextTransformation.length;
+        const rows = nextTransformation[0].length;
+
+        const fromX = this.originCoordX;
+        const toX = fromX + cols;
+
+        const fromY = this.originCoordY;
+        const toY = fromY + rows;
+
+        // indeces for the transformation, for loop is iterating over the indeces of the grid matrix
+        let x2 = 0;
+        let y2 = 0;
+
+        for (let x = fromX; x < toX; x++) {
+            y2 = 0;
+            for (let y = fromY; y < toY; y++) {
+                if (nextTransformation[x2][y2] == 1 && gridMatrix[x][y] == 1) {
+                    return true;
+                }
+                y2 += 1;
+            }
+            x2 += 1;
         }
         return false;
     }

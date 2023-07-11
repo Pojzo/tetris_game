@@ -32,10 +32,6 @@ export default class Sidebar extends Phaser.GameObjects.Container {
         this.createSidebar();
 
         this.scene.add.existing(this);
-        this.update({
-            'score': 5,
-            'level': 3
-        })
     }
     /**
      * 
