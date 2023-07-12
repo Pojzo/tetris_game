@@ -1,6 +1,5 @@
 import * as colors from '../game/colors.js';
 import { pieceColors, pieceStrings } from '../game/shapes.js';
-
 import { gameConfig } from '../config/game_config.js';
 import { windowConfig } from '../config/window_config.js';
 
@@ -8,8 +7,9 @@ import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
-const gameFPS = 2;
-const keyFPS = 12;
+let gameFPS = 2;
+const horizontalKeyFPS = 12;
+const verticalKeyFPS = 20;
 
 const gameStates = {
     'running': 0,
@@ -20,10 +20,17 @@ export default class Game extends Phaser.Scene {
     constructor() {
         super('game');
         this.gameDelay = 1000 / gameFPS;
-        this.keyDelay = 1000 / keyFPS;
+        this.horizontalKeyDelay = 1000 / horizontalKeyFPS;
+        this.verticalKeyDelay = 1000 / verticalKeyFPS;
 
-        this.frameTime = 0;
-        this.keyFrameTime = 0;
+        this.gameFrameTime = 0;
+        this.horizontalKeyFrameTime = 0;
+        this.verticalKeyFrameTime = 0;
+
+
+        this.timeLeftFirstPressed = -1;
+        this.timeRightFirstPressed = -1;
+        this.timeDownFirstPressed = -1;
 
         this.leftDown = false;
         this.rightDown = false;
@@ -51,13 +58,16 @@ export default class Game extends Phaser.Scene {
         this.createNewShape();
 
         // this.controller = new Controller(this);
-        // this.controller.registerKeys(this.handleKeys);
+        // this.controller.registerKeys(this.handleKeys, this);
+
+        this.cursorKeys = this.input.keyboard.createCursorKeys();
 
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
-        this.input.keyboard.on('keydown-DOWN', () => this.handleKeys('down'), this);
+        /*
         this.input.keyboard.on('keydown-LEFT', () => this.handleKeys('left'), this);
         this.input.keyboard.on('keydown-RIGHT', () => this.handleKeys('right'), this);
+        */
 
         this.gameState = 0;
     }
@@ -71,6 +81,7 @@ export default class Game extends Phaser.Scene {
         if (this.gameState === 1) {
             return;
         }
+        this.handleCursorKeys(time);
         this.updateVerticalMovement(time, delta);
         this.updateHorizontalMovement(time, delta);
     }
@@ -82,21 +93,17 @@ export default class Game extends Phaser.Scene {
      * @param {number} delta 
      */
     updateVerticalMovement(time, delta) {
-        this.frameTime += delta;
-        if (this.frameTime > this.gameDelay) {
-            if (!this.activeShape.moveDown(this.grid.array)) {
-                this.addShapeToGrid(this.activeShape);
-                this.createNewShape();
-                this.handleTetris();
-                this.sidebar.update({
-                    'tilesSpawned': this.sidebar.tilesSpawned + 1
-                })
-            }
-            this.sidebar.update({
-                'score': this.sidebar.score + 1
-            })
-            this.keyBuffer = null;
-            this.frameTime = 0;
+        // this is just normal piece movement down
+        this.gameFrameTime += delta;
+        if (this.gameFrameTime > this.gameDelay) {
+            this.shapeMoveDown(this.activeShape);
+            this.gameFrameTime = 0;
+        }
+
+        this.verticalKeyFrameTime += delta;
+        if (this.verticalKeyFrameTime > this.verticalKeyDelay) {
+            this.shapeVerticalMovement(this.activeShape, time);
+            this.verticalKeyFrameTime = 0;
         }
     }
     /**
@@ -106,14 +113,11 @@ export default class Game extends Phaser.Scene {
      * @param {number} delta 
      */
     updateHorizontalMovement(time, delta) {
-        /*
-        this.keyFrameTime += delta;
-        if (this.keyFrameTime > this.keyDelay) {
-            this.shapeHorizontalMovement(this.activeShape);
-            this.shapeRotate(this.activeShape);
-            this.keyFrameTime = 0;
+        this.horizontalKeyFrameTime += delta;
+        if (this.horizontalKeyFrameTime > this.horizontalKeyDelay) {
+            this.shapeHorizontalMovement(this.activeShape, time);
+            this.horizontalKeyFrameTime = 0;
         }
-        */
     }
 
     /**
@@ -123,15 +127,43 @@ export default class Game extends Phaser.Scene {
     handleKeys(key) {
         console.log("called with", key);
         switch (key) {
-            case 'left':
-                this.activeShape.moveLeft(this.grid.array);
-                break;
-            case 'right':
-                this.activeShape.moveRight(this.grid.array);
-                break;
             case 'up':
-                this.activeShape.rotateRight(this.grid.array);
+                this.shapeRotate(this.activeShape);
                 break;
+            case 'down':
+                this.shapeMoveDown(this.activeShape);
+                break;
+        }
+    }
+    handleCursorKeys(time) {
+        if (this.cursorKeys.left.isDown) {
+            this.leftDown = true;
+            this.rightDown = false;
+            if (this.timeLeftFirstPressed === -1) {
+                this.timeLeftFirstPressed = time;
+            }
+        }
+        else {
+            this.timeLeftFirstPressed = -1;
+        }
+        if (this.cursorKeys.right.isDown) {
+            this.rightDown = true;
+            this.leftDown = false;
+            if (this.timeRightFirstPressed === -1) {
+                this.timeRightFirstPressed = time;
+            }
+        }
+        else {
+            this.timeRightFirstPressed = -1;
+        }
+        if (this.cursorKeys.down.isDown) {
+            this.bottomDown = true;
+            if (this.timeDownFirstPressed === -1) {
+                this.timeDownFirstPressed = time;
+            }
+        }
+        else {
+            this.timeDownFirstPressed = -1;
         }
     }
     /**
@@ -147,25 +179,62 @@ export default class Game extends Phaser.Scene {
      * @brief Move the shape on left or right
      * @param {Shape} shape - Shape to move
      */
-    shapeHorizontalMovement(shape) {
+    shapeHorizontalMovement(shape, time) {
         if (this.leftDown) {
-            shape.moveLeft(this.grid.array);
+            const deltaFromFirstPress = time - this.timeLeftFirstPressed;
+            console.log(time);
+            if (time - deltaFromFirstPress > this.horizontalKeyDelay * 2) {
+                shape.moveLeft(this.grid.array);
+                this.leftDown = false;
+            }
         }
         else if (this.rightDown) {
-            shape.moveRight(this.grid.array);
+            const deltaFromFirstPress = time - this.timeRightFirstPressed;
+            if (time - deltaFromFirstPress > this.horizontalKeyDelay * 2) {
+                shape.moveRight(this.grid.array);
+                this.rightDown = false;
+            }
         }
         this.leftDown = false;
         this.rightDown = false;
     }
     /**
-     * @brief Rotate the shape clockwise - top key, anticlockwise - left key
-     * @param {Shape} shape 
+     * 
+     * @param {Phaser.GameObjects} shape 
+     * @param {number} time 
      */
-    shapeRotate(shape) {
-        if (this.topDown) {
-            shape.rotateRight(this.grid.array);
+    shapeVerticalMovement(shape, time) {
+        if (this.bottomDown) {
+            const deltaFromFirstPress = time - this.timeDownFirstPressed;
+            if (time - deltaFromFirstPress > this.verticalKeyDelay * 2) {
+                this.shapeMoveDown(this.activeShape);
+                this.bottomDown = false;
+            }
         }
-        this.topDown = false;
+    }
+    /**
+      * @brief Rotate the shape clockwise - top key, anticlockwise - left key
+      * @param {Shape} shape 
+      */
+    shapeRotate(shape) {
+        shape.rotateRight(this.grid.array);
+    }
+
+    shapeMoveDown(shape) {
+        if (!shape.moveDown(this.grid.array)) {
+            this.addShapeToGrid(this.activeShape);
+            this.updateSpeed();
+            this.createNewShape();
+            this.handleTetris();
+            this.sidebar.update({
+                'tilesSpawned': this.sidebar.tilesSpawned + 1
+            })
+
+        }
+        this.sidebar.update({
+            'score': this.sidebar.score + 1
+        })
+        this.frameTime = 0;
     }
     /**
      * @brief Add shape to the grid array. Take each rect contained within the shape and add it to the grid as a 1
@@ -225,18 +294,19 @@ export default class Game extends Phaser.Scene {
         }
         this.gameState = gameStates.running;
     }
+    updateSpeed() {
+        gameFPS += 0.05;
+        this.gameDelay = 1000 / gameFPS;
+    }
 }
 
 class Controller {
-    constructor(context) {
-        this.context = context;
-    }
-    registerKeys(callback) {
-        this.input.keyboard.on('keydown-SPACE', () => callback('space'));
-        this.input.keyboard.on('keydown-SPACE', () => callback('space'));
-        this.input.keyboard.on('keydown-UP', () => callback('up'));
-        this.input.keyboard.on('keydown-DOWN', () => callback('down'));
-        this.input.keyboard.on('keydown-LEFT', () => callback('left'));
-        this.input.keyboard.on('keydown-RIGHT', () => callback('right'));
+    registerKeys(context, callback) {
+        this.input.keyboard.on('keydown-SPACE', () => callback('space'), context);
+        this.input.keyboard.on('keydown-SPACE', () => callback('space'), context);
+        this.input.keyboard.on('keydown-UP', () => callback('up'), context);
+        this.input.keyboard.on('keydown-DOWN', () => callback('down'), context);
+        this.input.keyboard.on('keydown-LEFT', () => callback('left'), context);
+        this.input.keyboard.on('keydown-RIGHT', () => callback('right'), context);
     }
 }

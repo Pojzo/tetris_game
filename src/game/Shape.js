@@ -88,9 +88,7 @@ export default class Shape {
      *        the shape, return false
      */
     moveDown(gridMatrix) {
-        const atBottom = this.isAtBottom();
-
-        if (atBottom) {
+        if (this.isAtBottom()) {
             return false;
         }
         const collision = this.detectCollision(gridMatrix, 0, 1);

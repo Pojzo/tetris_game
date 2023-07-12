@@ -64,13 +64,12 @@ export default class Grid {
         })
     }
     /**
-     * @brief Apply gravity, so that every 1 is either on the bottom or on another 1
+     * 
      */
     applyGravity() {
         for (let j = 0; j < this.cols; j++) {
             // this stores the ones in reversed order from the bottom to top
             let rectsInOrder = [];
-            let newColumn = [];
             for (let i = this.rows - 1; i > 0; i--) {
                 if (this.array[i][j] === 1) {
                     rectsInOrder.push(this.rectArray[i][j]);
@@ -79,9 +78,8 @@ export default class Grid {
                 this.rectArray[i][j] = null;
             }
             let startY = this.rows - 1;
-            let newLen = rectsInOrder.length;
 
-            while (newLen--) {
+            while (rectsInOrder.length !== 0) {
                 this.array[startY][j] = 1;
                 const rect = rectsInOrder.pop();
                 this.rectArray[startY][j] = rect;
@@ -91,6 +89,10 @@ export default class Grid {
 
                 startY--;
             }
+        }
+        const newIndeces = this.getFilledRows();
+        if (newIndeces.length !== 0) {
+            this.applyGravity();
         }
     }
 }
