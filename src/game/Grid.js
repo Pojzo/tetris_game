@@ -1,4 +1,5 @@
 import { gameConfig } from "../config/game_config.js";
+import * as colors from './colors.js';
 import ShapeRect from "./ShapeRect.js";
 
 export default class Grid {
@@ -8,13 +9,53 @@ export default class Grid {
      * @param {number} rows
      * @param {number} cols
      */
-    constructor(scene, rows, cols) {
+    constructor(scene) {
         this.scene = scene;
-        this.rows = rows;
-        this.cols = cols;
 
-        this.array = Array(rows).fill().map(() => Array(cols).fill(0));
-        this.rectArray = Array(rows).fill().map(() => Array(cols).fill(null));
+        this.rows = gameConfig.numRows;
+        this.cols = gameConfig.numCols;
+
+        this.array = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+        this.rectArray = Array(this.rows).fill().map(() => Array(this.cols).fill(null));
+    }
+    /**
+     * @brief Reset the grid to default values - all zeros and if there are any rect objects, destroy them
+     */
+    resetGrid() {
+        this.array = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                const rect = this.rectArray[i][j];
+                if (rect !== null) {
+                    rect.setVisible(false).setActive(false);
+                    this.rectArray[i][j] = null;
+                }
+            }
+        }
+    }
+    /**
+     * @brief Draw vertical and horizontal lines across the grid
+     */
+    drawGridLines() {
+        const rectWidth = gameConfig.rectWidth;
+        const rectHeight = gameConfig.rectHeight;
+
+        const gameWidth = gameConfig.gameWidth;
+        const gameHeight = gameConfig.gameHeight;
+
+        for (let i = 0; i < this.rows; i++) {
+            this.scene.add.line(0, 0, 0, i * rectHeight, gameWidth, i * rectHeight)
+                .setStrokeStyle(1, colors.COLOR_GRAY)
+                .setAlpha(0.5)
+                .setOrigin(0, 0);
+        }
+
+        for (let j = 0; j < this.cols; j++) {
+            this.scene.add.line(0, 0, j * rectWidth, 0, j * rectWidth, gameHeight)
+                .setStrokeStyle(1, colors.COLOR_GRAY)
+                .setAlpha(0.5)
+                .setOrigin(0, 0);
+        }
     }
     /**
      * @brief Change the value at the coodinates to one in this.array. Create a copy of rect and add it to

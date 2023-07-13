@@ -267,4 +267,16 @@ export default class Shape {
         }
         return topLeftMost;
     }
+    /**
+     * @brief Check if any of the rects are at the 0th y coordinate
+     */
+    isAtCeiling() {
+        for (let i = 0; i < this.rects.length; i++) {
+            const coordY = this.rects[i].coordY;
+            if (coordY === 0)  {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -7,6 +7,13 @@ import Sidebar from '../game/sidebar.js';
 import Shape from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
+/**
+ * gameFPS - how often the vertical movement is updated - piece falling down
+ * horizontalKeyFPS - how often the game checks if the left or right key have been pressed,
+ *                    basically controls the vertical speed of the piece
+ * verticalKeyFPS - how often the game checks if the bottom arrow has been pressed, controlling the speed at which the 
+ *                  piece can be moved down
+ */
 let gameFPS = 2;
 const horizontalKeyFPS = 12;
 const verticalKeyFPS = 20;
@@ -22,11 +29,12 @@ export default class Game extends Phaser.Scene {
         this.gameDelay = 1000 / gameFPS;
         this.horizontalKeyDelay = 1000 / horizontalKeyFPS;
         this.verticalKeyDelay = 1000 / verticalKeyFPS;
-
+        this.grid = new Grid(this);
+    }
+    init() {
         this.gameFrameTime = 0;
         this.horizontalKeyFrameTime = 0;
         this.verticalKeyFrameTime = 0;
-
 
         this.timeLeftFirstPressed = -1;
         this.timeRightFirstPressed = -1;
@@ -37,8 +45,13 @@ export default class Game extends Phaser.Scene {
         this.topDown = false;
         this.bottomDown = false;
 
-        this.grid = new Grid(this, gameConfig.numRows, gameConfig.numCols);
+        this.gameState = 0;
+
+        this.grid.resetGrid();
+        // this.createNewShape();
+        console.log("init was called");
     }
+
     preload() {
         this.load.image('background', '../assets/background.png')
         this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -51,25 +64,15 @@ export default class Game extends Phaser.Scene {
         const gameHeight = gameConfig.gameHeight;
 
         this.add.rectangle(0, 0, gameWidth, gameHeight, colors.COLOR_BLACK);
+        this.grid.drawGridLines();
 
         this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_YELLOW);
-
-        this.shapes = [];
         this.createNewShape();
-
-        // this.controller = new Controller(this);
-        // this.controller.registerKeys(this.handleKeys, this);
 
         this.cursorKeys = this.input.keyboard.createCursorKeys();
 
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
-        /*
-        this.input.keyboard.on('keydown-LEFT', () => this.handleKeys('left'), this);
-        this.input.keyboard.on('keydown-RIGHT', () => this.handleKeys('right'), this);
-        */
-
-        this.gameState = 0;
     }
     /**
      * 
@@ -125,7 +128,6 @@ export default class Game extends Phaser.Scene {
      * @param {string} key - String representation of the key that was pressed
      */
     handleKeys(key) {
-        console.log("called with", key);
         switch (key) {
             case 'up':
                 this.shapeRotate(this.activeShape);
@@ -182,7 +184,6 @@ export default class Game extends Phaser.Scene {
     shapeHorizontalMovement(shape, time) {
         if (this.leftDown) {
             const deltaFromFirstPress = time - this.timeLeftFirstPressed;
-            console.log(time);
             if (time - deltaFromFirstPress > this.horizontalKeyDelay * 2) {
                 shape.moveLeft(this.grid.array);
                 this.leftDown = false;
@@ -222,6 +223,7 @@ export default class Game extends Phaser.Scene {
 
     shapeMoveDown(shape) {
         if (!shape.moveDown(this.grid.array)) {
+            this.checkGameOver();
             this.addShapeToGrid(this.activeShape);
             this.updateSpeed();
             this.createNewShape();
@@ -297,6 +299,15 @@ export default class Game extends Phaser.Scene {
     updateSpeed() {
         gameFPS += 0.05;
         this.gameDelay = 1000 / gameFPS;
+    }
+
+    /**
+     * @brief Check if the game is over by calling the shape.isAtCeiling() function
+     */
+    checkGameOver() {
+        if (this.activeShape.isAtCeiling()) {
+            this.scene.start('game-over');
+        }
     }
 }
 
