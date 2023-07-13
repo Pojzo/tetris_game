@@ -267,48 +267,49 @@ export default class Game extends Phaser.Scene {
      */
     handleTetris() {
         // this means that there is a tetris
-        const filledRow = this.grid.getFirstFilledRow();
-        if (filledRow !== null) {
+        let filledRow = this.grid.getFirstFilledRow();
+        while (filledRow !== null) {
             this.grid.removeRow(filledRow);
             this.grid.applyGravity(filledRow);
+            filledRow = this.grid.getFirstFilledRow();
         }
     }
-    /**
-     * 
-     * @returns {string} Randomly selected string representing a shape
-     */
-    getRandomPiece() {
-        return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
+/**
+ * 
+ * @returns {string} Randomly selected string representing a shape
+ */
+getRandomPiece() {
+    return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
+}
+/**
+ * @returns {number} Randomly selected color for the shape
+ */
+getRandomColor() {
+    return pieceColors[Math.floor(Math.random() * pieceColors.length)];
+}
+/**
+ * @brief This function is called upon pressing the space bar
+ */
+handlePause() {
+    if (this.gameState === gameStates.running) {
+        this.gameState = gameStates.paused;
+        return;
     }
-    /**
-     * @returns {number} Randomly selected color for the shape
-     */
-    getRandomColor() {
-        return pieceColors[Math.floor(Math.random() * pieceColors.length)];
-    }
-    /**
-     * @brief This function is called upon pressing the space bar
-     */
-    handlePause() {
-        if (this.gameState === gameStates.running) {
-            this.gameState = gameStates.paused;
-            return;
-        }
-        this.gameState = gameStates.running;
-    }
-    updateSpeed() {
-        gameFPS += 0.05;
-        this.gameDelay = 1000 / gameFPS;
-    }
+    this.gameState = gameStates.running;
+}
+updateSpeed() {
+    gameFPS += 0.05;
+    this.gameDelay = 1000 / gameFPS;
+}
 
-    /**
-     * @brief Check if the game is over by calling the shape.isAtCeiling() function
-     */
-    checkGameOver() {
-        if (this.activeShape.isAtCeiling()) {
-            this.scene.start('game-over');
-        }
+/**
+ * @brief Check if the game is over by calling the shape.isAtCeiling() function
+ */
+checkGameOver() {
+    if (this.activeShape.isAtCeiling()) {
+        this.scene.start('game-over');
     }
+}
 }
 
 class Controller {

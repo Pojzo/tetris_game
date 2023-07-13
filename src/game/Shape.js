@@ -149,6 +149,9 @@ export default class Shape {
         if (this.detectCollisionAfterRotation(gridMatrix)) {
             return false;
         }
+        if (this.fixOutOfBoundsAfterRotation(gridMatrix)) {
+            return false;
+        }
         if (this.transformationIndex == 3) {
             this.transformationIndex = 0;
         }
@@ -236,6 +239,33 @@ export default class Shape {
         return false;
     }
     /**
+     * @brief Check if the piece is out of bounds after rotating it, if yes, move it either to the left or right
+     *        so that it stays withing the boundaries of the game 
+     * @param {Array[]} gridMatrix 
+     */
+    fixOutOfBoundsAfterRotation(gridMatrix) {
+        const nextTransformationIndex = this.transformationIndex == 3 ? 0 : this.transformationIndex + 1;
+        const nextTransformation = this.shapeTransformations[nextTransformationIndex];
+        const size = nextTransformation.length;
+        const numCols = gridMatrix[0].length;
+        if (this.originCoordX > numCols / 2) {
+            let maxRectCoordX = 0;
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const offsetX = this.originCoordX + j;
+                    if (offsetX >= numCols) {
+                        maxRectCoordX = offsetX > maxRectCoordX ? offsetX : maxRectCoordX;
+                    }
+                }
+            }
+            const numberMoveLeft = maxRectCoordX - numCols + 1; 
+            for (let i = 0; i < numberMoveLeft; i++) {
+                console.log("Moving left");
+                this.moveLeft(gridMatrix);
+            }
+        }
+    }
+    /**
      * 
      * @returns True if none of the pieces are touching the left wall
      */
@@ -273,7 +303,7 @@ export default class Shape {
     isAtCeiling() {
         for (let i = 0; i < this.rects.length; i++) {
             const coordY = this.rects[i].coordY;
-            if (coordY === 0)  {
+            if (coordY === 0) {
                 return true;
             }
         }
