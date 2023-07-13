@@ -66,7 +66,7 @@ export default class Game extends Phaser.Scene {
         this.add.rectangle(0, 0, gameWidth, gameHeight, colors.COLOR_BLACK);
         this.grid.drawGridLines();
 
-        this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_YELLOW);
+        this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_GRAY);
         this.createNewShape();
 
         this.cursorKeys = this.input.keyboard.createCursorKeys();

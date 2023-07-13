@@ -34,6 +34,7 @@ export default class Shape {
      * @param {number} x Starting x position of the shape
      * @param {*} y Starting y position of the shape
      * @returns Null if the shape doesn't exist
+     * 
      */
     buildShape(gridOffsetX, gridOffsetY) {
         try {
@@ -248,6 +249,7 @@ export default class Shape {
         const nextTransformation = this.shapeTransformations[nextTransformationIndex];
         const size = nextTransformation.length;
         const numCols = gridMatrix[0].length;
+
         if (this.originCoordX > numCols / 2) {
             let maxRectCoordX = 0;
             for (let i = 0; i < size; i++) {
