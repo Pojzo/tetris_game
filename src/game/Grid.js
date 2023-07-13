@@ -31,8 +31,7 @@ export default class Grid {
      * @brief Checks if the array has any row filled with ones
      * @returns {Array} Array of row indeces which contain only ones
      */
-    getFilledRows() {
-        let filledRows = [];
+    getFirstFilledRow() {
         for (let i = this.rows - 1; i > 0; i--) {
             let onesOnly = true;
             for (let j = 0; j < this.cols; j++) {
@@ -42,57 +41,42 @@ export default class Grid {
                 }
             }
             if (onesOnly) {
-                filledRows.push(i);
+                return i;
             }
         }
-        return filledRows;
+        return null;
     }
     /**
      * @brief Change rows that have all ones to all zeros. Destroy all rect objects that are in the rows given by indeces
      * @param {Array[]} indeces - Array of indeces of rows that contain only ones
      */
-    removeFilledRows(indeces) {
+    removeRow(index) {
         const destroyRectRow = row => {
             for (let i = 0; i < this.cols; i++) {
                 this.rectArray[row][i].setVisible(false).setActive(false);
                 this.rectArray[row][i] = null;
             }
         }
-        indeces.forEach(index => {
-            this.array[index].fill(0);
-            destroyRectRow(index);
-        })
+        this.array[index].fill(0);
+        destroyRectRow(index);
     }
     /**
      * 
      */
-    applyGravity() {
-        for (let j = 0; j < this.cols; j++) {
-            // this stores the ones in reversed order from the bottom to top
-            let rectsInOrder = [];
-            for (let i = this.rows - 1; i > 0; i--) {
+    applyGravity(row) {
+        for (let j = 0; j < this.rows; j++) {
+            for (let i = row - 1; i > 0; i--) {
                 if (this.array[i][j] === 1) {
-                    rectsInOrder.push(this.rectArray[i][j]);
+                    this.array[i][j] = 0;
+                    this.array[i + 1][j] = 1;
+                    const rect = this.rectArray[i][j];
+                    rect.coordX = j;
+                    rect.coordY = i + 1;
+                    rect.updatePosition();
+                    this.rectArray[i][j] = null;
+                    this.rectArray[i + 1][j] = rect;
                 }
-                this.array[i][j] = 0;
-                this.rectArray[i][j] = null;
             }
-            let startY = this.rows - 1;
-
-            while (rectsInOrder.length !== 0) {
-                this.array[startY][j] = 1;
-                const rect = rectsInOrder.pop();
-                this.rectArray[startY][j] = rect;
-                rect.coordX = j;
-                rect.coordY = startY;
-                rect.updatePosition();
-
-                startY--;
-            }
-        }
-        const newIndeces = this.getFilledRows();
-        if (newIndeces.length !== 0) {
-            this.applyGravity();
         }
     }
 }

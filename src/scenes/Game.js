@@ -265,10 +265,10 @@ export default class Game extends Phaser.Scene {
      */
     handleTetris() {
         // this means that there is a tetris
-        const filledRows = this.grid.getFilledRows();
-        if (filledRows.length !== 0) {
-            this.grid.removeFilledRows(filledRows);
-            this.grid.applyGravity();
+        const filledRow = this.grid.getFirstFilledRow();
+        if (filledRow !== null) {
+            this.grid.removeRow(filledRow);
+            this.grid.applyGravity(filledRow);
         }
     }
     /**
