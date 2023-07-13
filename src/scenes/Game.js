@@ -14,9 +14,10 @@ import Grid from '../game/Grid.js';
  * verticalKeyFPS - how often the game checks if the bottom arrow has been pressed, controlling the speed at which the 
  *                  piece can be moved down
  */
-let gameFPS = 2;
+let gameFPS = 1.5;
 const horizontalKeyFPS = 12;
 const verticalKeyFPS = 20;
+const shapeBufferLen = 4;
 
 const gameStates = {
     'running': 0,
@@ -47,8 +48,9 @@ export default class Game extends Phaser.Scene {
 
         this.gameState = 0;
 
+        this.shapeBuffer = [];
+
         this.grid.resetGrid();
-        // this.createNewShape();
         console.log("init was called");
     }
 
@@ -67,7 +69,9 @@ export default class Game extends Phaser.Scene {
         this.grid.drawGridLines();
 
         this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_GRAY);
-        this.createNewShape();
+
+        this.expandShapeBuffer();
+        this.setActiveShape();
 
         this.cursorKeys = this.input.keyboard.createCursorKeys();
 
@@ -225,8 +229,9 @@ export default class Game extends Phaser.Scene {
         if (!shape.moveDown(this.grid.array)) {
             this.checkGameOver();
             this.addShapeToGrid(this.activeShape);
-            this.updateSpeed();
-            this.createNewShape();
+            this.updateDifficulty();
+            this.expandShapeBuffer();
+            this.setActiveShape();
             this.handleTetris();
             this.sidebar.update({
                 'tilesSpawned': this.sidebar.tilesSpawned + 1
@@ -234,7 +239,7 @@ export default class Game extends Phaser.Scene {
 
         }
         this.sidebar.update({
-            'score': this.sidebar.score + 1
+            'score': this.sidebar.score + this.sidebar.level
         })
         this.frameTime = 0;
     }
@@ -251,6 +256,18 @@ export default class Game extends Phaser.Scene {
         })
         shape.rects = [];
     }
+
+    /**
+     * @brief Expand the shape buffer so that it's full
+     */
+    expandShapeBuffer() {
+        while (this.shapeBuffer.length !== shapeBufferLen) {
+            const shape = this.createNewShape();
+            this.shapeBuffer.push(shape);
+        }
+        this.sidebar.setNextShapes(this.shapeBuffer.slice(1));
+    }
+
     /**
      * @brief Create new randomly selected shape and place it on the top level at random x coordinate
      */
@@ -260,7 +277,21 @@ export default class Game extends Phaser.Scene {
         const pieceColor = this.getRandomColor();
 
         const convertedPieceColor = colors.convertHexToColor(pieceColor);
-        this.activeShape = new Shape(this, 3, 0, pieceCode, convertedPieceColor);
+        const newShape = new Shape(this, 3, 0, pieceCode, convertedPieceColor);
+
+        return newShape;
+    }
+    /**
+     * 
+     */
+    setActiveShape() {
+        const newShape = this.shapeBuffer.shift();
+        this.activeShape = newShape;
+        const originCoordX = this.activeShape.originCoordX;
+        const originCoordY = this.activeShape.originCoordY;
+
+        this.activeShape.destroyShape();
+        this.activeShape.buildShape(originCoordX, originCoordY);
     }
     /**
      * @brief Check if any row/rows are fully filled and if so, rearrange the pieces accordingly
@@ -272,44 +303,53 @@ export default class Game extends Phaser.Scene {
             this.grid.removeRow(filledRow);
             this.grid.applyGravity(filledRow);
             filledRow = this.grid.getFirstFilledRow();
+            this.sidebar.update({
+                'score': this.sidebar.score + this.sidebar.level * 200
+            })
         }
     }
-/**
- * 
- * @returns {string} Randomly selected string representing a shape
- */
-getRandomPiece() {
-    return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
-}
-/**
- * @returns {number} Randomly selected color for the shape
- */
-getRandomColor() {
-    return pieceColors[Math.floor(Math.random() * pieceColors.length)];
-}
-/**
- * @brief This function is called upon pressing the space bar
- */
-handlePause() {
-    if (this.gameState === gameStates.running) {
-        this.gameState = gameStates.paused;
-        return;
+    /**
+     * 
+     * @returns {string} Randomly selected string representing a shape
+     */
+    getRandomPiece() {
+        return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
     }
-    this.gameState = gameStates.running;
-}
-updateSpeed() {
-    gameFPS += 0.05;
-    this.gameDelay = 1000 / gameFPS;
-}
+    /**
+     * @returns {number} Randomly selected color for the shape
+     */
+    getRandomColor() {
+        return pieceColors[Math.floor(Math.random() * pieceColors.length)];
+    }
+    /**
+     * @brief This function is called upon pressing the space bar
+     */
+    handlePause() {
+        if (this.gameState === gameStates.running) {
+            this.gameState = gameStates.paused;
+            return;
+        }
+        this.gameState = gameStates.running;
+    }
+    updateDifficulty() {
+        if (this.sidebar.tilesSpawned !== 0 && this.sidebar.tilesSpawned % 10 === 0) {
+            gameFPS += 0.15;
+            const currentLevel = this.sidebar.level;
+            this.sidebar.update({
+                'level': currentLevel + 1
+            })
+            this.gameDelay = 1000 / gameFPS;
+        }
+    }
 
-/**
- * @brief Check if the game is over by calling the shape.isAtCeiling() function
- */
-checkGameOver() {
-    if (this.activeShape.isAtCeiling()) {
-        this.scene.start('game-over');
+    /**
+     * @brief Check if the game is over by calling the shape.isAtCeiling() function
+     */
+    checkGameOver() {
+        if (this.activeShape.isAtCeiling()) {
+            this.scene.start('game-over');
+        }
     }
-}
 }
 
 class Controller {

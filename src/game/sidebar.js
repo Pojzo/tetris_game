@@ -1,4 +1,5 @@
 import * as colors from './colors.js';
+import Shape from './Shape.js';
 
 export default class Sidebar extends Phaser.GameObjects.Container {
     /**
@@ -72,7 +73,7 @@ export default class Sidebar extends Phaser.GameObjects.Container {
      */
     createTextFields() {
         const offsetX = 20;
-        const offsetY = this.sidebarHeight * (3/5);
+        const offsetY = this.sidebarHeight * (3 / 5);
 
         this.scoreText = this.scene.add.text(offsetX, offsetY, this.getScoreString(), {
             fontSize: '20px',
@@ -149,6 +150,9 @@ export default class Sidebar extends Phaser.GameObjects.Container {
     getTilesSpawnedString() {
         return `Tiles: ${this.tilesSpawned}`;
     }
+    setNextShapes(shapes) {
+        this.nextShapesContainer.update(shapes);
+    }
 }
 
 class NextShapesContainer extends Phaser.GameObjects.Container {
@@ -162,8 +166,55 @@ class NextShapesContainer extends Phaser.GameObjects.Container {
      */
     constructor(scene, x, y, width, height) {
         super(scene, x, y);
-        const rect = this.scene.add.rectangle(0, 0, width, height, colors.COLOR_BLACK).setOrigin(0, 0);
-        this.add(rect);
+        const background = this.scene.add.rectangle(0, 0, width, height, colors.COLOR_BLACK).setOrigin(0, 0);
+
+        this.add(background);
+
+        this.width = width;
+        this.height = height;
+
+        this.rectWidth = (this.width / 4) * 0.90;
+        this.rectHeight = (this.height / 12) * 0.95;
+
         this.scene.add.existing(this);
+
+        this.rects = [];
+    }
+    /**
+     * 
+     * @param {Shape[]} shapes - These shapes are set at the beginning
+     */
+    update(shapes) {
+        console.log(this.rects);
+        if (this.rects.length !== 0) {
+            for (let i = 0; i < this.rects.length; i++) {
+                this.rects[i].setVisible(false).setActive(false);
+            }
+        }
+        this.rects = [];
+
+        const numShapes = shapes.length
+        const shapeOffsetYIncrement = this.height / numShapes;
+
+        let shapeOffsetY = (this.rectHeight) * numShapes / 2;
+
+        for (let i = 0; i < numShapes; i++) {
+            const shapeHorizontalRects = shapes[i].getShapeWidth();
+            const shapeLen = shapeHorizontalRects * this.rectWidth;
+
+            const shapeOffsetX = (this.width - shapeLen) / 2;
+
+            const newRects = shapes[i].buildShapeRectsAtPosition(this.scene, shapeOffsetX, shapeOffsetY, this.rectWidth, this.rectHeight);
+            newRects.forEach(rect => {
+                this.rects.push(rect);
+                console.log("pushing");
+            })
+
+            newRects.forEach(rect => {
+                this.scene.add.existing(rect);
+                this.add(rect);
+            })
+            shapeOffsetY += shapeOffsetYIncrement;
+        }
     }
 }

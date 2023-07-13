@@ -12,6 +12,7 @@ export default class Shape {
      * @param {string} shapeCode - String representation of the shape
      */
     constructor(scene, x, y, shapeCode, color) {
+
         this.scene = scene;
         this.shapeCode = shapeCode;
         this.color = color;
@@ -26,8 +27,7 @@ export default class Shape {
         this.originCoordY = y;
 
         this.rects = []
-
-        this.buildShape(this.originCoordX, this.originCoordY);
+        this.shapeTransformations = shapes[this.shapeCode];
     }
     /**
      * 
@@ -37,14 +37,6 @@ export default class Shape {
      * 
      */
     buildShape(gridOffsetX, gridOffsetY) {
-        try {
-            this.shapeTransformations = shapes[this.shapeCode];
-        }
-        catch (err) {
-            console.error("Invalid shape");
-            console.log(err);
-            return null;
-        }
         const curTransformation = this.shapeTransformations[this.transformationIndex];
 
         const rows = curTransformation.length;
@@ -70,6 +62,43 @@ export default class Shape {
             skipY += this.rectHeight;
         }
         this.scene.add.existing(this.rects);
+    }
+    /**
+     * @brief Build and place the shape at the given x and y coordinates. this.buildShape() creates the shape in the game 
+     *        based on this.originCoordX and this.originCoordY. This function was created to create a shape outside of the game 
+     *        and in a different scene;
+     * @param {Phaser.Scene} scene 
+     * @param {number} x 
+     * @param {number} y 
+     */
+    buildShapeRectsAtPosition(scene, x, y, rectWidth, rectHeight) {
+        // when building on a given position, we should build from the first filled and not from the origin
+        const cutShapeString = this.shapeCode + "Cut";
+        const cutShape = shapes[cutShapeString];
+
+        console.log(this.shapeCode);
+        const rows = cutShape.length;
+        const cols = cutShape[0].length;
+
+        let rects = [];
+
+        let skipX, skipY = 0;
+        for (let i = 0; i < rows; i++) {
+            skipX = 0;
+            for (let j = 0; j < cols; j++) {
+                if (cutShape[i][j] == 0) {
+                    skipX += rectWidth;
+                    continue;
+                }
+                const rect = new ShapeRect(scene, skipX + x, skipY + y, j, i, rectWidth, rectHeight, this.color).setOrigin(0, 0);
+                console.log(rect.width);
+
+                rects.push(rect);
+                skipX += rectWidth;
+            }
+            skipY += rectHeight;
+        }
+        return rects;
     }
     /**
      * @brief Destroy all rects of a shape
@@ -260,7 +289,7 @@ export default class Shape {
                     }
                 }
             }
-            const numberMoveLeft = maxRectCoordX - numCols + 1; 
+            const numberMoveLeft = maxRectCoordX - numCols + 1;
             for (let i = 0; i < numberMoveLeft; i++) {
                 console.log("Moving left");
                 this.moveLeft(gridMatrix);
@@ -310,5 +339,19 @@ export default class Shape {
             }
         }
         return false;
+    }
+    /**
+     * @brief Get the length of the shape
+     */
+    getShapeWidth() {
+        const shapeString = this.shapeCode + "Width";
+        return shapes[shapeString];
+    }
+    /**
+     * @brief Get the height of the shape
+     */
+    getShapeHeight() {
+        const shapeString = this.shapeCode + "Height";
+        return shapes[shapeString];
     }
 }
