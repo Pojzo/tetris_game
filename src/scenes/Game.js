@@ -312,6 +312,7 @@ export default class Game extends Phaser.Scene {
      * 
      * @returns {string} Randomly selected string representing a shape
      */
+    utOf
     getRandomPiece() {
         return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
     }

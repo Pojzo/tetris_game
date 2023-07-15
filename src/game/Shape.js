@@ -295,6 +295,26 @@ export default class Shape {
                 this.moveLeft(gridMatrix);
             }
         }
+        else {
+            /*
+            let minRectCoordX = 999;
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    for (let x = 0; x < this.rects.length; i++) {
+                        const coordX = this.rects[x].coordX;
+                        if (coordX < minRectCoordX) {
+                            minRectCoordX = coordX;
+                        }
+                    }
+                }
+            }
+            const numberMoveRight = minRectCoordX > 0 ? 0 : -minRectCoordX;
+            for (let i = 0; i < numberMoveRight; i++) {
+                console.log("Moving right");
+                this.moveRight(gridMatrix);
+            }
+            */
+        }
     }
     /**
      * 
