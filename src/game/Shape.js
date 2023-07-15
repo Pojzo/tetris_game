@@ -314,6 +314,8 @@ export default class Shape {
                 this.moveRight(gridMatrix);
             }
             */
+           /*
+           */
         }
     }
     /**
