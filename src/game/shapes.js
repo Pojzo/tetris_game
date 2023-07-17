@@ -1,6 +1,11 @@
+const cobaltBlue  = [3, 65, 174];
+const apple       = [114, 203, 59];
+const cyberYellow = [255, 213, 0];
+const beer 	      = [255, 151, 28];
+const RYBRed 	  = [255, 50, 19];
+
 export const pieceStrings = ['I', 'J', 'L', 'O', 'S', 'T'];
-export const pieceColors = ['00ffff', 'ffff00', '800080', '00ff00', 'ff0000', 'ff7f00', '7f7f7f'];
-// this color doens't work export const pieceColors = ['0000ff'];
+export const pieceColors = [cobaltBlue, apple, cyberYellow, beer, RYBRed];
 
 export const I = [
 	[

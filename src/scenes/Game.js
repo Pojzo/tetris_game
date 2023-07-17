@@ -276,7 +276,7 @@ export default class Game extends Phaser.Scene {
         const pieceCode = this.getRandomPiece();
         const pieceColor = this.getRandomColor();
 
-        const convertedPieceColor = colors.convertHexToColor(pieceColor);
+        const convertedPieceColor = colors.convertRGBToColor(pieceColor);
         const newShape = new Shape(this, 3, 0, pieceCode, convertedPieceColor);
 
         return newShape;
@@ -312,7 +312,6 @@ export default class Game extends Phaser.Scene {
      * 
      * @returns {string} Randomly selected string representing a shape
      */
-    utOf
     getRandomPiece() {
         return pieceStrings[Math.floor(Math.random() * pieceStrings.length)];
     }

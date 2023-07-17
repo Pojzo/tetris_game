@@ -15,5 +15,18 @@ export const convertHexToColor = hexColor => {
     const blue = parseInt(hexColor.substring(4, 2), 16);
 
     const colorValue = Phaser.Display.Color.GetColor(red, green, blue);
+    console.log(colorValue, "more");
+    return colorValue;
+}
+
+/**
+ * 
+ * @param {Array[]} rgbColor 
+ * @returns Convert color in the format used by phaser
+ */
+export const convertRGBToColor = rgbColor => {
+    const [r, g, b] = [...rgbColor];
+    const colorValue = Phaser.Display.Color.GetColor(r, g, b);
+
     return colorValue;
 }
