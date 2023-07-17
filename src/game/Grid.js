@@ -111,9 +111,12 @@ export default class Grid {
                     this.array[i][j] = 0;
                     this.array[i + 1][j] = 1;
                     const rect = this.rectArray[i][j];
+                    /*
                     rect.coordX = j;
                     rect.coordY = i + 1;
                     rect.updatePosition();
+                    */
+                    rect.updatePositionAnimation(j, i + 1);
                     this.rectArray[i][j] = null;
                     this.rectArray[i + 1][j] = rect;
                 }

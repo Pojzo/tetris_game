@@ -26,4 +26,26 @@ export default class ShapeRect extends Phaser.GameObjects.Rectangle {
         this.x = this.coordX * this.width;
         this.y = this.coordY * this.height;
     }
+    /**
+     * 
+     * @param {number} x - New x position on the grid to animate the pieces to
+     * @param {number} y - New y position on the grid to animate the piece to
+     */
+    updatePositionAnimation(x, y) {
+        const newX = x * this.width;
+        const newY = y * this.height;
+
+        this.scene.tweens.add({
+            targets: this,            
+            y: newY,
+            duration: 200,
+            ease: 'Linear',
+            onComplete: () => {
+
+            }
+        })
+
+        this.coordX = x;
+        this.coordY = y;
+    }
 }
