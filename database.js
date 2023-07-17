@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
-const db = new sqlite3.Database('Scoreboard');
+const db = new sqlite3.Database('Scoreboard.db');
 
 db.serialize(() => {
     db.run('CREATE TABLE IF NOT EXISTS game_results (id INTEGER PRIMARY KEY AUTOINCREMENT, nickname TEXT, score INTEGER, level INTEGER, tiles INTEGER)');
