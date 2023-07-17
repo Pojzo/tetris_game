@@ -86,6 +86,7 @@ export default class Game extends Phaser.Scene {
      * @returns 
      */
     update(time, delta) {
+        console.log("updating", 1000 / delta);
         if (this.gameState === 1) {
             return;
         }
@@ -374,7 +375,11 @@ export default class Game extends Phaser.Scene {
      */
     checkGameOver() {
         if (this.activeShape.isAtCeiling()) {
-            this.scene.start('game-over');
+            this.scene.start('game-over', {
+                'score': this.sidebar.score,
+                'level': this.sidebar.level,
+                'tilesSpawned': this.sidebar.tilesSpawned
+            })
         }
     }
 }
