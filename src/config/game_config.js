@@ -12,6 +12,11 @@ export const gameConfig = {
     numCols: 10,
 }
 
+export const animationConfig = {
+    tetrisAnimationDuration: 300,
+    tetrisAnimationEase: 'Linear'
+}
+
 const calculateRectSize = config => {
     config.rectWidth = config.gameWidth / config.numCols;
     config.rectHeight = config.gameHeight / config.numRows;

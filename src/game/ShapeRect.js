@@ -1,3 +1,5 @@
+import { animationConfig } from "../config/game_config";
+
 export default class ShapeRect extends Phaser.GameObjects.Rectangle {
     /**
      * 
@@ -35,11 +37,14 @@ export default class ShapeRect extends Phaser.GameObjects.Rectangle {
         const newX = x * this.width;
         const newY = y * this.height;
 
+        const animationDuration = animationConfig.tetrisAnimationDuration;
+        const animationEase = animationConfig.tetrisAnimationEase;
+
         this.scene.tweens.add({
             targets: this,            
             y: newY,
-            duration: 200,
-            ease: 'Linear',
+            duration: animationDuration,
+            ease: animationEase,
             onComplete: () => {
 
             }
