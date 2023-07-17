@@ -78,6 +78,7 @@ export default class Game extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
+        this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
     }
     /**
      * 
@@ -139,6 +140,10 @@ export default class Game extends Phaser.Scene {
                 break;
             case 'down':
                 this.shapeMoveDown(this.activeShape);
+                break;
+            case 'esc':
+                this.scene.pause();
+                this.scene.launch('menu');
                 break;
         }
     }

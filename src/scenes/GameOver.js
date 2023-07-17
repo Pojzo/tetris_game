@@ -32,7 +32,7 @@ export default class GameOver extends Phaser.Scene {
         }
         const gameOverString = 'Game Over!';
         const gameOverText = this.add.text(0, 0, gameOverString, gameOverStyle).setOrigin(0, 0);
-        gameOverText.x = this.calculateXStartTextElementToCenter(gameOverText, this.cameras.main.width);
+        gameOverText.x = calculateXStartTextElementToCenter(gameOverText, this.cameras.main.width);
         gameOverText.y = this.cameras.main.height * 0.2;
 
         const startNewGameStyle = {
@@ -43,7 +43,7 @@ export default class GameOver extends Phaser.Scene {
 
         const startNewGameString = 'To start a new game, press SPACE';
         const startNewGameText = this.add.text(0, 0, startNewGameString, startNewGameStyle).setOrigin(0, 0);
-        startNewGameText.x = this.calculateXStartTextElementToCenter(startNewGameText, this.cameras.main.width);
+        startNewGameText.x = calculateXStartTextElementToCenter(startNewGameText, this.cameras.main.width);
         startNewGameText.y = this.cameras.main.height * 0.33;
     }
     /**
@@ -71,18 +71,9 @@ export default class GameOver extends Phaser.Scene {
 
             const textElement = this.add.text(0, 0, text, textStyle).setOrigin(0);
 
-            textElement.x = this.calculateXStartTextElementToCenter(textElement, screenWidth);
+            textElement.x = calculateXStartTextElementToCenter(textElement, screenWidth);
             textElement.y = screenHeight / 2 + index * spacing;
         })
-    }
-    /**
-     * @brief Calculates where to put a text element in order for the text to be centered
-     */
-    calculateXStartTextElementToCenter(textElement, screenWidth) {
-        const textWidth = textElement.displayWidth;
-        const x = (screenWidth - textWidth) / 2;
-
-        return x;
     }
 
     /**
@@ -91,4 +82,14 @@ export default class GameOver extends Phaser.Scene {
     startNewGame() {
         this.scene.start('game');
     }
+}
+
+/**
+    * @brief Calculates where to put a text element in order for the text to be centered
+    */
+export const calculateXStartTextElementToCenter = (textElement, screenWidth) => {
+    const textWidth = textElement.displayWidth;
+    const x = (screenWidth - textWidth) / 2;
+
+    return x;
 }
