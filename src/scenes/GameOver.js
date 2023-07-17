@@ -25,16 +25,26 @@ export default class GameOver extends Phaser.Scene {
      * @brief Display game over string in the upper part of the screen
      */
     displayGameOverMessage() {
-        const fontSize = 50;
-        const style = {
+        const gameOverStyle = {
             fontFamily: 'Arial',
-            fontSize: `${fontSize}px`,
+            fontSize: '48px',
             color: '#ffffff'
         }
-        const textString = 'Game Over!';
-        const gameOverText = this.add.text(0, 0, textString, style).setOrigin(0, 0);
+        const gameOverString = 'Game Over!';
+        const gameOverText = this.add.text(0, 0, gameOverString, gameOverStyle).setOrigin(0, 0);
         gameOverText.x = this.calculateXStartTextElementToCenter(gameOverText, this.cameras.main.width);
         gameOverText.y = this.cameras.main.height * 0.2;
+
+        const startNewGameStyle = {
+            fontFamily: 'Arial',
+            fontSize: '15px',
+            color: '#ffffff'
+        }
+
+        const startNewGameString = 'To start a new game, press SPACE';
+        const startNewGameText = this.add.text(0, 0, startNewGameString, startNewGameStyle).setOrigin(0, 0);
+        startNewGameText.x = this.calculateXStartTextElementToCenter(startNewGameText, this.cameras.main.width);
+        startNewGameText.y = this.cameras.main.height * 0.33;
     }
     /**
      * @brief Display statistics after the game has ended like the score, level and tiles spawned
