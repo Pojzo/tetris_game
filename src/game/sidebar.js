@@ -1,5 +1,5 @@
 import * as colors from './colors.js';
-import Shape from './Shape.js';
+import { ActiveShape } from './Shape.js';
 
 export default class Sidebar extends Phaser.GameObjects.Container {
     /**

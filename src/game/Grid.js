@@ -1,6 +1,6 @@
 import { gameConfig } from "../config/game_config.js";
 import * as colors from './colors.js';
-import ShapeRect from "./ShapeRect.js";
+import { ActiveShapeRect } from "./ShapeRect.js";
 
 export default class Grid {
     /**

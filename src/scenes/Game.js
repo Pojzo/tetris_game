@@ -4,7 +4,7 @@ import { gameConfig } from '../config/game_config.js';
 import { windowConfig } from '../config/window_config.js';
 
 import Sidebar from '../game/sidebar.js';
-import Shape from '../game/Shape.js';
+import { ActiveShape, GhostShape } from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
 /**
@@ -51,6 +51,8 @@ export default class Game extends Phaser.Scene {
         this.shapeBuffer = [];
 
         this.grid.resetGrid();
+        this.activeShape = null;
+        this.ghostShape = null;
     }
 
     preload() {
@@ -185,22 +187,30 @@ export default class Game extends Phaser.Scene {
      * @param {Shape} shape - Shape to move
      */
     shapeHorizontalMovement(shape, time) {
+        // this is ugly I'm aware
         if (this.leftDown) {
             const deltaFromFirstPress = time - this.timeLeftFirstPressed;
             if (time - deltaFromFirstPress > this.horizontalKeyDelay * 2) {
-                shape.moveLeft(this.grid.array);
+                const canMoveLeft = shape.moveLeft(this.grid.array);
+                if (canMoveLeft) {
+                    this.ghostShape.updateAfterMovingLeft(this.grid.array);
+                }
                 this.leftDown = false;
             }
         }
         else if (this.rightDown) {
             const deltaFromFirstPress = time - this.timeRightFirstPressed;
             if (time - deltaFromFirstPress > this.horizontalKeyDelay * 2) {
-                shape.moveRight(this.grid.array);
+                const canMoveRight = shape.moveRight(this.grid.array);
+                if (canMoveRight) {
+                    this.ghostShape.updateAfterMovingRight(this.grid.array);
+                }
                 this.rightDown = false;
             }
         }
         this.leftDown = false;
         this.rightDown = false;
+        this.updateGhostShape(shape);
     }
     /**
      * 
@@ -217,11 +227,22 @@ export default class Game extends Phaser.Scene {
         }
     }
     /**
+     * @brief Create a transparent piece at the destination of a piece to make it more clear where it's going to land
+     * @param {Shape} shape
+     */
+    updateGhostShape(shape) {
+        // shape.updateGhostPiece();
+    }
+    /**
       * @brief Rotate the shape clockwise - top key, anticlockwise - left key
       * @param {Shape} shape 
       */
     shapeRotate(shape) {
-        shape.rotateRight(this.grid.array);
+        const canRotate = shape.rotateRight(this.grid.array);
+        if (canRotate) {
+            this.ghostShape.destroyShape();
+            this.ghostShape.buildShape(this.grid.array, this.activeShape);
+        }
     }
 
     shapeMoveDown(shape) {
@@ -276,7 +297,7 @@ export default class Game extends Phaser.Scene {
         const pieceColor = this.getRandomColor();
 
         const convertedPieceColor = colors.convertRGBToColor(pieceColor);
-        const newShape = new Shape(this, 3, 0, pieceCode, convertedPieceColor);
+        const newShape = new ActiveShape(this, 3, 0, pieceCode, convertedPieceColor);
 
         return newShape;
     }
@@ -284,6 +305,9 @@ export default class Game extends Phaser.Scene {
      * 
      */
     setActiveShape() {
+        if (this.ghostShape !== null) {
+            this.ghostShape.destroyShape();
+        }
         const newShape = this.shapeBuffer.shift();
         this.activeShape = newShape;
         const originCoordX = this.activeShape.originCoordX;
@@ -291,7 +315,11 @@ export default class Game extends Phaser.Scene {
 
         this.activeShape.destroyShape();
         this.activeShape.buildShape(originCoordX, originCoordY);
+
+        this.ghostShape = new GhostShape(this, this.activeShape.shapeCode);
+        this.ghostShape.buildShape(this.grid.array, this.activeShape);
     }
+
     /**
      * @brief Check if any row/rows are fully filled and if so, rearrange the pieces accordingly
      */
