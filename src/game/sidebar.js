@@ -185,7 +185,6 @@ class NextShapesContainer extends Phaser.GameObjects.Container {
      * @param {Shape[]} shapes - These shapes are set at the beginning
      */
     update(shapes) {
-        console.log(this.rects);
         if (this.rects.length !== 0) {
             for (let i = 0; i < this.rects.length; i++) {
                 this.rects[i].setVisible(false).setActive(false);
@@ -207,7 +206,6 @@ class NextShapesContainer extends Phaser.GameObjects.Container {
             const newRects = shapes[i].buildShapeRectsAtPosition(this.scene, shapeOffsetX, shapeOffsetY, this.rectWidth, this.rectHeight);
             newRects.forEach(rect => {
                 this.rects.push(rect);
-                console.log("pushing");
             })
 
             newRects.forEach(rect => {

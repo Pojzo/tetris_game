@@ -51,7 +51,6 @@ export default class Game extends Phaser.Scene {
         this.shapeBuffer = [];
 
         this.grid.resetGrid();
-        console.log("init was called");
     }
 
     preload() {

@@ -76,7 +76,6 @@ export default class Shape {
         const cutShapeString = this.shapeCode + "Cut";
         const cutShape = shapes[cutShapeString];
 
-        console.log(this.shapeCode);
         const rows = cutShape.length;
         const cols = cutShape[0].length;
 
@@ -91,7 +90,6 @@ export default class Shape {
                     continue;
                 }
                 const rect = new ShapeRect(scene, skipX + x, skipY + y, j, i, rectWidth, rectHeight, this.color).setOrigin(0, 0);
-                console.log(rect.width);
 
                 rects.push(rect);
                 skipX += rectWidth;
@@ -123,7 +121,6 @@ export default class Shape {
         }
         const collision = this.detectCollision(gridMatrix, 0, 1);
         if (collision === true) {
-            console.log("Collision at", this.originCoordX, this.originCoordY);
             return false;
         }
         for (let i = 0; i < this.rects.length; i++) {
@@ -274,11 +271,14 @@ export default class Shape {
      * @param {Array[]} gridMatrix 
      */
     fixOutOfBoundsAfterRotation(gridMatrix) {
+
+        console.log(this.originCoordX);
         const nextTransformationIndex = this.transformationIndex == 3 ? 0 : this.transformationIndex + 1;
         const nextTransformation = this.shapeTransformations[nextTransformationIndex];
         const size = nextTransformation.length;
         const numCols = gridMatrix[0].length;
 
+        // this means that the piece is in the right side of the screen
         if (this.originCoordX > numCols / 2) {
             let maxRectCoordX = 0;
             for (let i = 0; i < size; i++) {
@@ -291,31 +291,27 @@ export default class Shape {
             }
             const numberMoveLeft = maxRectCoordX - numCols + 1;
             for (let i = 0; i < numberMoveLeft; i++) {
-                console.log("Moving left");
                 this.moveLeft(gridMatrix);
             }
         }
+        // left side of the screen
         else {
-            /*
             let minRectCoordX = 999;
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    for (let x = 0; x < this.rects.length; i++) {
-                        const coordX = this.rects[x].coordX;
-                        if (coordX < minRectCoordX) {
-                            minRectCoordX = coordX;
+                    for (let x = 0; x < size; x++) {
+                        const offsetX = this.originCoordX + j;
+                        if (offsetX < minRectCoordX) {
+                            minRectCoordX = offsetX;
                         }
                     }
                 }
             }
             const numberMoveRight = minRectCoordX > 0 ? 0 : -minRectCoordX;
+            console.log(numberMoveRight, minRectCoordX);
             for (let i = 0; i < numberMoveRight; i++) {
-                console.log("Moving right");
                 this.moveRight(gridMatrix);
             }
-            */
-           /*
-           */
         }
     }
     /**
