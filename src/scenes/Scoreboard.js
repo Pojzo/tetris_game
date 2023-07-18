@@ -11,22 +11,51 @@ const firebaseConfig = {
     measurementId: "G-GKSRSRP4MN"
 };
 
-
 export default class ScoreboardScene extends Phaser.Scene {
 
     constructor() {
         super('scoreboard');
         this.newScore = 20;
     }
+    preload() {
+        this.load.plugin('rexfirebaseplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfirebaseplugin.min.js', true);
+    }
     async create() {
+        if (this.leaderBoard === undefined) {
+            firebase.initializeApp(firebaseConfig);
+            this.leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
+                root: 'Tetris-Leaderboard'
+            });
+
+            this.leaderBoard.setUser('1', 'Pojzo');
+            // this.leaderBoard.setBoardID('Tetris-Leaderboard');
+
+        }
+        const scores = await this.leaderBoard.loadFirstPage();
+
 
         this.createBackground();
-        this.createScoresText();
+        this.createButtons();
+        this.createLeaderBoard(scores);
+        console.log(scores.length);
+    }
+    init() {
 
-        await this.leaderboard.post(this.newScore);
-        const scores = await this.leaderboard.loadFirstPage();
-        console.log(scores);
+    }
 
+    createButtons() {
+        const buttonStyle = {
+            fontSize: '32px',
+            fill: '#ffffff',
+        };
+        const backButton = this.add.text(20, 20, 'Back', buttonStyle)
+            .setOrigin(0)
+            .setInteractive();
+
+        backButton.on('pointerup', () => {
+            this.scene.stop();
+            this.scene.launch('menu');
+        })
     }
     createBackground() {
         this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, colors.COLOR_BLACK)
@@ -37,40 +66,54 @@ export default class ScoreboardScene extends Phaser.Scene {
         const y = this.cameras.main.height / 2;
         this.scoresText = this.add.text(x, y, 'Loading', {
             color: '#ffffff',
-            fontSize: '45px'
+            fontSize: '45px',
         })
             .setOrigin(0.5);
     }
-    /**
-     * 
-     * @param {object} jsonScores 
-     */
-    updateScoresText(jsonScores) {
-        this.scoresText.text = 'loaded';
-        Object.entries(jsonScores).forEach(entry => {
-            const [key, value] = entry;
-            const nickname = value.nickname;
-            const score = value.score;
-            console.log(nickname, score);
-        })
-    }
-    init() {
+    createLeaderBoard(scores) {
+        const screenWidth = this.cameras.main.width;
+        const screenHeight = this.cameras.main.height;
+        const leaderboardWidth = screenWidth / 1.3;
+        const leaderboardHeight = screenHeight / 1.2;
 
-    firebase.initializeApp(firebaseConfig);
-        this.load.plugin('rexfirebaseplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfirebaseplugin.min.js', true);
-        this.plugins.get('rexfirebaseplugin').add.leaderBoard(firebaseConfig);//error
-        var rexfire = new window.rexfirebase();
+        const startX = (screenWidth - leaderboardWidth) / 2;
+        const startY = (screenHeight - leaderboardHeight) / 2;
 
-        this.leaderboard = rexfire.add.leaderboard({
-            root: 'leaderboard'
-        })
-        this.leaderboard.setUser({
-            userID: 'test',
-            userName: 'Gazdik'
+        const leaderboardContainer = this.add.container(startX, startY);
+        leaderboardContainer.setSize(leaderboardWidth, leaderboardHeight);
+        const leaderboardBackground = this.add.rectangle(0, 0, leaderboardWidth, leaderboardHeight, colors.COLOR_GRAY)
+            .setOrigin(0, 0);
 
-        })
-    }
-    update() {
+        leaderboardContainer.add(leaderboardBackground);
 
+        const nicknameStartX = leaderboardWidth * 0.15;
+        const nicknameStartY = 30;
+
+        const scoreStartX = leaderboardWidth * 0.7
+        const spacingY = 30;
+
+        const textStyle = {
+            fontFamily: 'Arial',
+            fontSize: '48px',
+            color: '#000000'
+        }
+        for (let i = 0; i < scores.length; i++) {
+            const scoreObject = scores[i];
+            const nickname = scoreObject.nickname;
+            const score = scoreObject.score;
+            
+            // Add the name first
+            const nicknameX = nicknameStartX;
+            const nicknameY = i * spacingY + nicknameStartY;
+            const nicknameText = this.add.text(nicknameX, nicknameY, nickname, textStyle).setOrigin(0, 0);
+            leaderboardContainer.add(nicknameText);
+            
+            // Then the score
+            const scoreX = scoreStartX; 
+            const scoreY = nicknameY;
+
+            const scoreText = this.add.text(scoreX, scoreY, score, textStyle).setOrigin(0, 0);
+            leaderboardContainer.add(scoreText);
+        }
     }
 }

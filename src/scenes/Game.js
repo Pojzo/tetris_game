@@ -33,6 +33,7 @@ export default class Game extends Phaser.Scene {
         this.grid = new Grid(this);
     }
     init() {
+        this.scene.start('scoreboard');
         this.gameFrameTime = 0;
         this.horizontalKeyFrameTime = 0;
         this.verticalKeyFrameTime = 0;
