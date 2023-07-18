@@ -67,6 +67,7 @@ export default class ScoreboardScene extends Phaser.Scene {
         this.leaderboard.setUser({
             userID: 'test',
             userName: 'Gazdik'
+
         })
     }
     update() {
