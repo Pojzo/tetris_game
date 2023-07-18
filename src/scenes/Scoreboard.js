@@ -1,43 +1,69 @@
 import { scoresEndpoint } from "../config/api_config.js";
+import { gameConfig } from "../config/game_config.js";
 import * as colors from '../game/colors.js';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyATZQr5xvTeZJkOqaNrFBNWMI-j4YzQdOA",
-    authDomain: "tetris-f158d.firebaseapp.com",
-    projectId: "tetris-f158d",
-    storageBucket: "tetris-f158d.appspot.com",
-    messagingSenderId: "166449362109",
-    appId: "1:166449362109:web:f7c8aec3a8c2b9c0a6b3d4",
-    measurementId: "G-GKSRSRP4MN"
-};
+import { firebaseConfig } from '../config/api_config.js';
 
 export default class ScoreboardScene extends Phaser.Scene {
-
     constructor() {
         super('scoreboard');
-        this.newScore = 20;
+        this.scoreLimit = 10;
+        this.scoresCollection = "scores";
     }
     preload() {
-        this.load.plugin('rexfirebaseplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfirebaseplugin.min.js', true);
     }
     async create() {
-        if (this.leaderBoard === undefined) {
+        if (this.db === undefined) {
             firebase.initializeApp(firebaseConfig);
-            this.leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
-                root: 'Tetris-Leaderboard'
-            });
-
-            this.leaderBoard.setUser('1', 'Pojzo');
-            // this.leaderBoard.setBoardID('Tetris-Leaderboard');
-
+            this.db = firebase.firestore();
+            console.log("Creating the db");
         }
-        const scores = await this.leaderBoard.loadFirstPage();
-
+        this.db.collection(this.scoresCollection).add({
+            nickname: 'Gazdik',
+            level: 3,
+            score: 2000,
+            tiles: 30
+        })
+            .then(docRef => {
+                console.log("Score added with ID: ", docRef);
+            })
+            .catch(error => {
+                console.error("Couldn't add ", error);
+            })
 
         this.createBackground();
         this.createButtons();
-        this.createLeaderBoard(scores);
-        console.log(scores.length);
+
+        this.getTopScores()
+            .then(scores => {
+                this.createLeaderBoard(scores)
+            })
+            .catch(err => {
+                this.createLeaderBoard([])
+            });
+    }
+    async getTopScores() {
+        return new Promise((resolve, reject) => {
+            this.db.collection(this.scoresCollection)
+                .orderBy("score", "desc")
+                .limit(this.scoreLimit)
+                .get()
+                .then(querySnapshot => {
+                    const scores = [];
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data()
+                        scores.push({
+                            nickname: data.nickname,
+                            score: data.score,
+                            level: data.level,
+                            tiles: data.tiles
+                        });
+                    })
+                    resolve(scores);
+                })
+                .catch(err => {
+                    reject(error);
+                })
+        });
     }
     init() {
 
@@ -81,7 +107,7 @@ export default class ScoreboardScene extends Phaser.Scene {
 
         const leaderboardContainer = this.add.container(startX, startY);
         leaderboardContainer.setSize(leaderboardWidth, leaderboardHeight);
-        const leaderboardBackground = this.add.rectangle(0, 0, leaderboardWidth, leaderboardHeight, colors.COLOR_GRAY)
+        const leaderboardBackground = this.add.rectangle(0, 0, leaderboardWidth, leaderboardHeight, colors.convertHexToColor('#03396c'))
             .setOrigin(0, 0);
 
         leaderboardContainer.add(leaderboardBackground);
@@ -89,27 +115,29 @@ export default class ScoreboardScene extends Phaser.Scene {
         const nicknameStartX = leaderboardWidth * 0.15;
         const nicknameStartY = 30;
 
-        const scoreStartX = leaderboardWidth * 0.7
-        const spacingY = 30;
+        const scoreStartX = leaderboardWidth * 0.6
 
+        const fontSize = 23;
         const textStyle = {
-            fontFamily: 'Arial',
-            fontSize: '48px',
-            color: '#000000'
+            fontFamily: gameConfig.font,
+            fontSize: fontSize,
+            color: '#a70000'
         }
+        const spacingY = fontSize * 1.3;
+        console.log(scores);
         for (let i = 0; i < scores.length; i++) {
             const scoreObject = scores[i];
             const nickname = scoreObject.nickname;
             const score = scoreObject.score;
-            
+
             // Add the name first
             const nicknameX = nicknameStartX;
             const nicknameY = i * spacingY + nicknameStartY;
             const nicknameText = this.add.text(nicknameX, nicknameY, nickname, textStyle).setOrigin(0, 0);
             leaderboardContainer.add(nicknameText);
-            
+
             // Then the score
-            const scoreX = scoreStartX; 
+            const scoreX = scoreStartX;
             const scoreY = nicknameY;
 
             const scoreText = this.add.text(scoreX, scoreY, score, textStyle).setOrigin(0, 0);

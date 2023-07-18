@@ -1,3 +1,4 @@
+import { gameConfig } from '../config/game_config.js';
 import * as colors from './colors.js';
 import { ActiveShape } from './Shape.js';
 
@@ -72,24 +73,25 @@ export default class Sidebar extends Phaser.GameObjects.Container {
      * @brief Create text fields inside the container like the score, level or number of spawned tiles
      */
     createTextFields() {
-        const offsetX = 20;
+        const offsetX = 10;
         const offsetY = this.sidebarHeight * (3 / 5);
+        const fontSize = 16;
 
         this.scoreText = this.scene.add.text(offsetX, offsetY, this.getScoreString(), {
-            fontSize: '20px',
-            fontFamily: 'Arial',
+            fontSize: fontSize,
+            fontFamily: gameConfig.font,
             color: '#000000'
         }).setOrigin(0, 0);
 
         this.levelText = this.scene.add.text(offsetX, offsetY + 30, this.getLevelString(), {
-            fontSize: '20px',
-            fontFamily: 'Arial',
+            fontSize: fontSize,
+            fontFamily: gameConfig.font,
             color: '#000000'
         });
 
         this.tilesSpawnedText = this.scene.add.text(offsetX, offsetY + 60, this.getTilesSpawnedString(), {
-            fontSize: '20px',
-            fontFamily: 'Arial',
+            fontSize: fontSize,
+            fontFamily: gameConfig.font,
             color: '#000000'
         });
     }

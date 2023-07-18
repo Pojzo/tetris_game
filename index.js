@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
 
 
 app.use('/main.js', express.static(path.join(__dirname, 'src', 'main.js')));
+app.use('/index.css', express.static(path.join(__dirname, 'index.css')));
 app.use('/lib', express.static(path.join(__dirname, 'src', 'lib')));
 app.use('/scenes', express.static(path.join(__dirname, 'src', 'scenes')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));

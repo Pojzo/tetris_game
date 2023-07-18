@@ -10,6 +10,7 @@ export const gameConfig = {
     gameHeight: windowHeight,
     numRows: 20,
     numCols: 10,
+    font: 'PressStart2P'
 }
 
 export const animationConfig = {
