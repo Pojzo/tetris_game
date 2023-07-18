@@ -47,7 +47,6 @@ export default class MenuScene extends Phaser.Scene {
         
         const buttons = [resumeGameButton, newGameButton, scoreBoardButton];
         const spacing = resumeGameButton.displayHeight * 1.5;
-        console.log(spacing);
         
         const startY = this.cameras.main.height * (2/5);
         buttons.forEach((button, index) => {
@@ -66,6 +65,9 @@ export default class MenuScene extends Phaser.Scene {
         newGameButton.on('pointerup', () => {
             this.startNewGame();
         })
+        scoreBoardButton.on('pointerup', () => {
+            this.openScoreboard();
+        })
     }
     /**
      * @brief Resume the game by calling the scene.resume function on 'game
@@ -77,5 +79,8 @@ export default class MenuScene extends Phaser.Scene {
     startNewGame() {
         this.scene.start('game');
         this.scene.stop();
+    }
+    openScoreboard() {
+        this.scene.start('scoreboard');
     }
 }
