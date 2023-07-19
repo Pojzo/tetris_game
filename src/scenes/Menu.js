@@ -82,6 +82,8 @@ export default class MenuScene extends Phaser.Scene {
     }
     openScoreboard() {
         this.scene.stop();
-        this.scene.launch('scoreboard');
+        this.scene.launch('scoreboard', {
+            previousScene: 'menu'
+        });
     }
 }

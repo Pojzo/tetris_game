@@ -3,33 +3,46 @@ import { gameConfig } from "../config/game_config.js";
 import * as colors from '../game/colors.js';
 import { firebaseConfig } from '../config/api_config.js';
 
+// Initialize the database
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+/**
+ * @brief Add data to the scoreboard using the database initialized using firebase.firestore()
+ * @param {object} data 
+ * @returns {Promise} 
+ */
+
+const scoresCollection = "scores";
+
+export const addScore = data => {
+    const { nickname, score, level, tiles} = data;
+    console.log(data);
+
+    return new Promise((resolve, reject) => {
+        db.collection(scoresCollection).add({
+            nickname: nickname,
+            score: score,
+            level: level,
+            tiles: tiles
+        })
+            .then(docRef => {
+                resolve("Added the score");
+            })
+            .catch(error => {
+                reject("Couldn't add score - problem with the database");
+            })
+    })
+}
+
 export default class ScoreboardScene extends Phaser.Scene {
     constructor() {
         super('scoreboard');
         this.scoreLimit = 10;
-        this.scoresCollection = "scores";
     }
     preload() {
     }
     async create() {
-        if (this.db === undefined) {
-            firebase.initializeApp(firebaseConfig);
-            this.db = firebase.firestore();
-            console.log("Creating the db");
-        }
-        this.db.collection(this.scoresCollection).add({
-            nickname: 'Gazdik',
-            level: 3,
-            score: 2000,
-            tiles: 30
-        })
-            .then(docRef => {
-                console.log("Score added with ID: ", docRef);
-            })
-            .catch(error => {
-                console.error("Couldn't add ", error);
-            })
-
         this.createBackground();
         this.createButtons();
 
@@ -43,7 +56,7 @@ export default class ScoreboardScene extends Phaser.Scene {
     }
     async getTopScores() {
         return new Promise((resolve, reject) => {
-            this.db.collection(this.scoresCollection)
+            db.collection(scoresCollection)
                 .orderBy("score", "desc")
                 .limit(this.scoreLimit)
                 .get()
@@ -65,8 +78,8 @@ export default class ScoreboardScene extends Phaser.Scene {
                 })
         });
     }
-    init() {
-
+    init(data) {
+        this.previousScene = data.previousScene;
     }
 
     createButtons() {
@@ -80,7 +93,7 @@ export default class ScoreboardScene extends Phaser.Scene {
 
         backButton.on('pointerup', () => {
             this.scene.stop();
-            this.scene.launch('menu');
+            this.scene.launch(this.previousScene);
         })
     }
     createBackground() {
