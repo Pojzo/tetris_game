@@ -33,13 +33,11 @@ export default class Game extends Phaser.Scene {
         this.grid = new Grid(this);
     }
     init() {
-        /*
         this.scene.start('game-over', {
             score: 50,
             level: 0,
             tiles: 25
         })
-        */
         this.gameFrameTime = 0;
         this.horizontalKeyFrameTime = 0;
         this.verticalKeyFrameTime = 0;
