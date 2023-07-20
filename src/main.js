@@ -9,7 +9,7 @@ console.log(Phaser);
 const windowWidth = windowConfig.windowWidth;
 const windowHeight = windowConfig.windowHeight;
 
-export default new Phaser.Game({
+let game = new Phaser.Game({
     type: Phaser.AUTO,
     width: windowWidth,
     height: windowHeight,
@@ -20,5 +20,7 @@ export default new Phaser.Game({
         arcade: {
             debug: true
         }
-    }
+    },
 })
+
+window.game = game;

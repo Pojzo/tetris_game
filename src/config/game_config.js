@@ -30,3 +30,14 @@ const calculateSidebarSize = config => {
 
 calculateRectSize(gameConfig);
 calculateSidebarSize(gameConfig);
+
+let musicOn = true;
+
+export const musicOnTrigger = () => {
+    musicOn = !musicOn;
+}
+
+export const getMusicOn = () => {
+    console.log("called");
+    return musicOn;
+}

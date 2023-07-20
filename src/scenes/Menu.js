@@ -1,4 +1,4 @@
-import { gameConfig } from "../config/game_config.js";
+import { gameConfig, getMusicOn, musicOnTrigger } from "../config/game_config.js";
 import * as colors from '../game/colors.js';
 
 import { calculateXStartTextElementToCenter } from "./GameOver.js";
@@ -124,7 +124,7 @@ export default class MenuScene extends Phaser.Scene {
             .setScale(scaleX, scaleY)
             .setOrigin(0);
 
-        this.checkboxImage.setVisible(this.game.musicOn);
+        this.checkboxImage.setVisible(getMusicOn());
         musicCheckbox.on('pointerup', () => {
             this.onCheckboxClick('music');
         })
@@ -139,7 +139,7 @@ export default class MenuScene extends Phaser.Scene {
         switch (value) {
             case 'music':
                 this.checkboxImage.setVisible(!this.checkboxImage.visible);
-                this.game.musicOn = !this.game.musicOn;
+                musicOnTrigger();
         }
     }
     /**

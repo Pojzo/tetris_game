@@ -1,7 +1,6 @@
 import * as colors from '../game/colors.js';
 import { pieceColors, pieceStrings } from '../game/shapes.js';
-import { gameConfig } from '../config/game_config.js';
-import { windowConfig } from '../config/window_config.js';
+import { gameConfig, getMusicOn } from '../config/game_config.js';
 
 import Sidebar from '../game/Sidebar.js';
 import { ActiveShape, GhostShape } from '../game/Shape.js';
@@ -57,9 +56,6 @@ export default class Game extends Phaser.Scene {
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
-        if (this.game.musicOn === null) {
-            this.game.musicOn = true;
-        }
         this.events.on('resume', this.onSceneResumed, this);
         this.createBackground();
         this.expandShapeBuffer();
@@ -72,9 +68,11 @@ export default class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
 
         this.music = this.sound.add('gameMusic');
-        this.music.play({
-            loop: true
-        });
+        if (getMusicOn()) {
+            this.music.play({
+                loop: true
+            });
+        }
     }
     /**
      * @brief Create background elements, grid lines along with the sidebar
@@ -396,7 +394,7 @@ export default class Game extends Phaser.Scene {
      * @brief Called when the scene is resumed. Resume the music that was stopped when menu was opened
      */
     onSceneResumed() {
-        if (this.game.musicOn) {
+        if (getMusicOn()) {
             this.music.resume();
         }
     }
