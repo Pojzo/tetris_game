@@ -85,6 +85,7 @@ export default class ScoreboardScene extends Phaser.Scene {
     createButtons() {
         const buttonStyle = {
             fontSize: '32px',
+            fontFamily: gameConfig.font,
             fill: '#ffffff',
         };
         const backButton = this.add.text(20, 20, 'Back', buttonStyle)

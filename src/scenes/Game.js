@@ -57,6 +57,7 @@ export default class Game extends Phaser.Scene {
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
+        this.game.musicOn = true;
         this.events.on('resume', this.onSceneResumed, this);
         this.createBackground();
         this.expandShapeBuffer();
@@ -199,6 +200,9 @@ export default class Game extends Phaser.Scene {
                     this.ghostShape.updateAfterMovingLeft(this.grid.array);
                 }
                 this.leftDown = false;
+            }
+            else {
+                console.log("too soon");
             }
         }
         else if (this.rightDown) {
@@ -390,17 +394,8 @@ export default class Game extends Phaser.Scene {
      * @brief Called when the scene is resumed. Resume the music that was stopped when menu was opened
      */
     onSceneResumed() {
-        this.music.resume();
-    }
-}
-
-class Controller {
-    registerKeys(context, callback) {
-        this.input.keyboard.on('keydown-SPACE', () => callback('space'), context);
-        this.input.keyboard.on('keydown-SPACE', () => callback('space'), context);
-        this.input.keyboard.on('keydown-UP', () => callback('up'), context);
-        this.input.keyboard.on('keydown-DOWN', () => callback('down'), context);
-        this.input.keyboard.on('keydown-LEFT', () => callback('left'), context);
-        this.input.keyboard.on('keydown-RIGHT', () => callback('right'), context);
+        if (this.game.musicOn) {
+            this.music.resume();
+        }
     }
 }
