@@ -52,6 +52,7 @@ export default class Game extends Phaser.Scene {
 
     preload() {
         this.load.image('keys', '../assets/keys.png');
+        this.load.image('esc', '../assets/esc.png');
         this.load.audio('gameMusic', '../assets/game_music.mp3')
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }

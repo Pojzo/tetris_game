@@ -91,7 +91,14 @@ export default class ScoreboardScene extends Phaser.Scene {
             .setOrigin(0)
             .setInteractive();
 
+        backButton.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+        })
+        backButton.on('pointerout', () => {
+            this.input.setDefaultCursor('auto');
+        })
         backButton.on('pointerup', () => {
+            this.input.setDefaultCursor('auto');
             this.scene.stop();
             this.scene.resume(this.previousScene);
         })

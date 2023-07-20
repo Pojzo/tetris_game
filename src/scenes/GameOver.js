@@ -183,6 +183,7 @@ export default class GameOver extends Phaser.Scene {
                 }
             }
             button.on('pointerup', () => {
+                this.input.setDefaultCursor('auto');
                 callback();
             })
             const buttonX = (screenWidth - button.displayWidth) / 2;

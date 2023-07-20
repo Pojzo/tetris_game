@@ -57,12 +57,14 @@ export default class Sidebar extends Phaser.GameObjects.Container {
         this.createNextShapeContainer();
         this.createTextFields();
         this.createKeysImage();
+        this.createEscImage();
         this.add(this.sidebarBackground);
         this.add(this.scoreText);
         this.add(this.levelText);
         this.add(this.tilesSpawnedText);
         this.add(this.nextShapesContainer);
         this.add(this.keysImage);
+        this.add(this.escImage);
     }
 
     /**
@@ -107,9 +109,30 @@ export default class Sidebar extends Phaser.GameObjects.Container {
      * @brief Addd image of keys to the bottom of the screen
      */
     createKeysImage() {
-        const keysX = 10;
+        this.keysImage = this.scene.add.image(0, 0, 'keys').setOrigin(0, 0);
         const keysY = this.sidebarHeight * 0.8;
-        this.keysImage = this.scene.add.image(keysX, keysY, 'keys').setOrigin(0, 0);
+        const keysX = (this.sidebarWidth - this.keysImage.displayWidth) / 2;
+        this.keysImage.x = keysX;
+        this.keysImage.y = keysY;
+    }
+    /**
+     * @brief Add esc image over the keys image
+     */
+    createEscImage() {
+        this.escImage = this.scene.add.image(0, 0, 'esc').setOrigin(0, 0);
+        const desiredWidth = this.sidebarWidth * 0.30;
+        const desiredHeight = this.sidebarHeight * 0.08;
+
+        const scaleX = desiredWidth / this.escImage.displayWidth;
+        const scaleY = desiredHeight / this.escImage.displayHeight;
+
+        this.escImage.setScale(scaleX, scaleY);
+        const escY = this.sidebarHeight * 0.74;
+        const escX = (this.sidebarWidth - this.escImage.displayWidth) / 2;
+
+        this.escImage.x = escX;
+        this.escImage.y = escY;
+        console.log(scaleX, scaleY);
     }
 
     /**

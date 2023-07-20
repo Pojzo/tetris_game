@@ -62,12 +62,15 @@ export default class MenuScene extends Phaser.Scene {
             })
         })
         resumeGameButton.on('pointerup', () => {
+            this.input.setDefaultCursor('auto');
             this.resumeGame();
         })
         newGameButton.on('pointerup', () => {
+            this.input.setDefaultCursor('auto');
             this.startNewGame();
         })
         scoreBoardButton.on('pointerup', () => {
+            this.input.setDefaultCursor('auto');
             this.openScoreboard();
         })
     }
