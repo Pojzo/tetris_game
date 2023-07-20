@@ -43,18 +43,26 @@ export default class Sidebar extends Phaser.GameObjects.Container {
      */
     createSidebar() {
 
+        const backgroundStyle = {
+            border: {
+                color: '#000000',
+                width: 3
+            }
+        }
         this.sidebarBackground = this.scene.add
             .rectangle(0, 0, this.sidebarWidth, this.sidebarHeight, this.sidebarColor)
             .setOrigin(0, 0)
-            .setStrokeStyle(5, colors.COLOR_GRAY);
+            .setStrokeStyle(3, colors.COLOR_BLACK);
 
         this.createNextShapeContainer();
         this.createTextFields();
+        this.createKeysImage();
         this.add(this.sidebarBackground);
         this.add(this.scoreText);
         this.add(this.levelText);
         this.add(this.tilesSpawnedText);
         this.add(this.nextShapesContainer);
+        this.add(this.keysImage);
     }
 
     /**
@@ -95,7 +103,14 @@ export default class Sidebar extends Phaser.GameObjects.Container {
             color: '#000000'
         });
     }
-
+    /**
+     * @brief Addd image of keys to the bottom of the screen
+     */
+    createKeysImage() {
+        const keysX = 10;
+        const keysY = this.sidebarHeight * 0.8;
+        this.keysImage = this.scene.add.image(keysX, keysY, 'keys').setOrigin(0, 0);
+    }
 
     /**
      * @brief Resets attributes to their initial values

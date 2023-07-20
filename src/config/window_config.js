@@ -1,4 +1,4 @@
 export const windowConfig = {
-    windowWidth: 480 * 1.54,
-    windowHeight: 640 * 1.4
+    windowWidth: 480 * 1.5,
+    windowHeight: 640 * 1.5
 }

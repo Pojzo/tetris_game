@@ -117,10 +117,11 @@ export default class ScoreboardScene extends Phaser.Scene {
 
         const startX = (screenWidth - leaderboardWidth) / 2;
         const startY = (screenHeight - leaderboardHeight) / 2;
+        const retroBlueHex = '#336699';
 
         const leaderboardContainer = this.add.container(startX, startY);
         leaderboardContainer.setSize(leaderboardWidth, leaderboardHeight);
-        const leaderboardBackground = this.add.rectangle(0, 0, leaderboardWidth, leaderboardHeight, colors.convertHexToColor('#03396c'))
+        const leaderboardBackground = this.add.rectangle(0, 0, leaderboardWidth, leaderboardHeight, colors.convertHexToColor(retroBlueHex))
             .setOrigin(0, 0);
 
         leaderboardContainer.add(leaderboardBackground);
@@ -128,13 +129,13 @@ export default class ScoreboardScene extends Phaser.Scene {
         const nicknameStartX = leaderboardWidth * 0.15;
         const nicknameStartY = 30;
 
-        const scoreStartX = leaderboardWidth * 0.6
+        const scoreStartX = leaderboardWidth * 0.7
 
         const fontSize = 23;
         const textStyle = {
             fontFamily: gameConfig.font,
             fontSize: fontSize,
-            color: '#a70000'
+            color: '#dd0000'
         }
         const spacingY = fontSize * 1.3;
         console.log(scores);

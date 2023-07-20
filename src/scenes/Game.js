@@ -3,7 +3,7 @@ import { pieceColors, pieceStrings } from '../game/shapes.js';
 import { gameConfig } from '../config/game_config.js';
 import { windowConfig } from '../config/window_config.js';
 
-import Sidebar from '../game/sidebar.js';
+import Sidebar from '../game/Sidebar.js';
 import { ActiveShape, GhostShape } from '../game/Shape.js';
 import Grid from '../game/Grid.js';
 
@@ -51,7 +51,8 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', '../assets/background.png')
+        this.load.image('keys', '../assets/keys.png');
+        this.load.audio('gameMusic', '../assets/game_music.mp3')
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
@@ -74,6 +75,8 @@ export default class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
         this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
+        this.music = this.sound.add('gameMusic');
+        this.music.play();
     }
     /**
      * 
