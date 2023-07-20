@@ -34,7 +34,8 @@ export default class MenuScene extends Phaser.Scene {
     createButtons() {
         const buttonStyle = {
             fontSize: '32px',
-            fill: '#ffffff'
+            fill: '#ffffff',
+            fontFamily: gameConfig.font
         };
         const resumeGameButton = this.add.text(this.game.config.width / 2, this.game.config.height / 2, 'Resume game', buttonStyle)
             .setOrigin(0.5)
@@ -83,7 +84,8 @@ export default class MenuScene extends Phaser.Scene {
         const fontSize = 33;
         const textStyle = {
             fontSize: fontSize,
-            fill: '#ffffff'
+            fill: '#ffffff',
+            fontFamily: gameConfig.font
         };
 
         const screenWidth = this.cameras.main.width;
@@ -99,7 +101,7 @@ export default class MenuScene extends Phaser.Scene {
         const checkboxSize = fontSize;
 
         const checkboxX = musicText.x + musicText.displayWidth + checkboxSize;
-        const checkboxY = musicTextY - checkboxSize / 8;
+        const checkboxY = musicTextY;
 
         const musicCheckbox = this.add.rectangle(checkboxX, checkboxY, checkboxSize, checkboxSize)
             .setOrigin(0)

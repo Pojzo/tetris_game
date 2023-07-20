@@ -22,7 +22,7 @@ class ShapeRect extends Phaser.GameObjects.Rectangle {
         this.coordY = coordY;
         this.color = fillColor;
 
-        this.setStrokeStyle(3);
+        this.setStrokeStyle(5);
 
         return this;
     }

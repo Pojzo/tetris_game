@@ -57,7 +57,9 @@ export default class Game extends Phaser.Scene {
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
-        this.game.musicOn = true;
+        if (this.game.musicOn === null) {
+            this.game.musicOn = true;
+        }
         this.events.on('resume', this.onSceneResumed, this);
         this.createBackground();
         this.expandShapeBuffer();
