@@ -33,11 +33,6 @@ export default class Game extends Phaser.Scene {
         this.grid = new Grid(this);
     }
     init() {
-        this.scene.start('game-over', {
-            score: 50,
-            level: 0,
-            tiles: 25
-        })
         this.gameFrameTime = 0;
         this.horizontalKeyFrameTime = 0;
         this.verticalKeyFrameTime = 0;
@@ -45,11 +40,6 @@ export default class Game extends Phaser.Scene {
         this.timeLeftFirstPressed = -1;
         this.timeRightFirstPressed = -1;
         this.timeDownFirstPressed = -1;
-
-        this.leftDown = false;
-        this.rightDown = false;
-        this.topDown = false;
-        this.bottomDown = false;
 
         this.gameState = 0;
 
@@ -182,15 +172,6 @@ export default class Game extends Phaser.Scene {
         else {
             this.timeDownFirstPressed = -1;
         }
-    }
-    /**
-     * @brief Set all keys to false
-     */
-    resetKeys() {
-        this.leftDown = false;
-        this.rightDown = false;
-        this.topDown = false;
-        this.bottomDown = false;
     }
     /**
      * @brief Move the shape on left or right
@@ -387,7 +368,7 @@ export default class Game extends Phaser.Scene {
             this.scene.start('game-over', {
                 'score': this.sidebar.score,
                 'level': this.sidebar.level,
-                'tilesSpawned': this.sidebar.tilesSpawned
+                'tiles': this.sidebar.tilesSpawned
             })
         }
     }

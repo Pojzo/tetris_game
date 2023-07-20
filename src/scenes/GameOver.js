@@ -12,7 +12,7 @@ export default class GameOver extends Phaser.Scene {
         this.nameFontSize = 45;
     }
     preload() {
-        this.input.keyboard.on('keydown-SHIFT', () => this.startNewGame(), this);
+        this.input.keyboard.on('keydown-CTRL', () => this.startNewGame(), this);
         this.input.keyboard.on("keydown", event => {
             const key = event.key;
             const keyCode = event.keyCode;
@@ -53,6 +53,12 @@ export default class GameOver extends Phaser.Scene {
      * @param {number} delta 
      */
     update(time, delta) {
+        if (this.gameSaved) {
+            if (this.cursorLine.visible) {
+                this.cursorLine.setVisible(false);
+            }
+            return;
+        }
         this.cursorBlinkTime += delta;
         if (this.cursorBlinkTime > this.cursorBlinkDelay) {
             this.cursorLine.setVisible(!this.cursorLine.visible);
@@ -80,7 +86,7 @@ export default class GameOver extends Phaser.Scene {
             color: '#0000FF'
         }
 
-        const startNewGameString = 'To start a new game, press SHIFT';
+        const startNewGameString = 'To start a new game, press CTRL';
         const startNewGameText = this.add.text(0, 0, startNewGameString, startNewGameStyle).setOrigin(0, 0);
         startNewGameText.x = calculateXStartTextElementToCenter(startNewGameText, this.cameras.main.width);
         startNewGameText.y = this.cameras.main.height * 0.18;

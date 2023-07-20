@@ -289,10 +289,12 @@ export class ActiveShape extends Shape {
         let x2 = 0;
         let y2 = 0;
 
+        let minX = 999;
+        let maxX = -1;
         for (let x = fromX; x < toX; x++) {
             y2 = 0;
             for (let y = fromY; y < toY; y++) {
-                if (nextTransformation[x2][y2] == 1 && gridMatrix[x][y] == 1) {
+                if (nextTransformation[y2][x2] === 1 && gridMatrix[y][x] === 1) {
                     return true;
                 }
                 y2 += 1;
@@ -310,6 +312,7 @@ export class ActiveShape extends Shape {
 
         const nextTransformationIndex = this.transformationIndex == 3 ? 0 : this.transformationIndex + 1;
         const nextTransformation = this.shapeTransformations[nextTransformationIndex];
+
         const size = nextTransformation.length;
         const numCols = gridMatrix[0].length;
 
@@ -334,11 +337,9 @@ export class ActiveShape extends Shape {
             let minRectCoordX = 999;
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    for (let x = 0; x < size; x++) {
-                        const offsetX = this.originCoordX + j;
-                        if (offsetX < minRectCoordX) {
-                            minRectCoordX = offsetX;
-                        }
+                    const offsetX = this.originCoordX + j;
+                    if (offsetX < minRectCoordX) {
+                        minRectCoordX = offsetX;
                     }
                 }
             }

@@ -201,11 +201,11 @@ class NextShapesContainer extends Phaser.GameObjects.Container {
 
         for (let i = 0; i < numShapes; i++) {
             const shapeHorizontalRects = shapes[i].getShapeWidth();
-            const shapeLen = shapeHorizontalRects * this.rectWidth;
+            const shapeLen = shapeHorizontalRects * this.rectWidth * 0.85;
 
             const shapeOffsetX = (this.width - shapeLen) / 2;
 
-            const newRects = shapes[i].buildShapeRectsAtPosition(this.scene, shapeOffsetX, shapeOffsetY, this.rectWidth, this.rectHeight);
+            const newRects = shapes[i].buildShapeRectsAtPosition(this.scene, shapeOffsetX, shapeOffsetY, this.rectWidth * 0.85, this.rectHeight);
             newRects.forEach(rect => {
                 this.rects.push(rect);
             })

@@ -3,7 +3,7 @@ import { windowConfig } from './window_config.js';
 const windowWidth = windowConfig.windowWidth;
 const windowHeight = windowConfig.windowHeight;
 
-const gameToMenuRatio = 0.7;
+const gameToMenuRatio = 0.63;
 
 export const gameConfig = {
     gameWidth: gameToMenuRatio * windowWidth,
