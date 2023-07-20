@@ -11,6 +11,8 @@ export default class MenuScene extends Phaser.Scene {
 
     }
     create() {
+        this.input.keyboard.on('keydown-ESC', this.resumeGame, this);
+
         this.createBackground();
         this.createButtons();
     }
@@ -81,7 +83,7 @@ export default class MenuScene extends Phaser.Scene {
         this.scene.stop();
     }
     openScoreboard() {
-        this.scene.stop();
+        this.scene.pause();
         this.scene.launch('scoreboard', {
             previousScene: 'menu'
         });

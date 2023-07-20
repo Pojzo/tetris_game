@@ -1,7 +1,7 @@
-import { gameConfig } from "../config/game_config.js";
+import { gameConfig } from '../config/game_config.js';
 import * as colors from '../game/colors.js';
 
-import { addScore } from "./Scoreboard.js";
+import { addScore } from './Scoreboard.js';
 
 export default class GameOver extends Phaser.Scene {
     constructor() {
@@ -10,10 +10,12 @@ export default class GameOver extends Phaser.Scene {
         this.cursorBlinkFPS = 2.3;
         this.cursorBlinkDelay = 1000 / this.cursorBlinkFPS;
         this.nameFontSize = 45;
+        this.music = null;
     }
     preload() {
+        this.load.audio('gameOverMusic', '../assets/game_over_music.mp3')
         this.input.keyboard.on('keydown-CTRL', () => this.startNewGame(), this);
-        this.input.keyboard.on("keydown", event => {
+        this.input.keyboard.on('keydown', event => {
             const key = event.key;
             const keyCode = event.keyCode;
             if (keyCode === Phaser.Input.Keyboard.KeyCodes.BACKSPACE) {
@@ -34,6 +36,10 @@ export default class GameOver extends Phaser.Scene {
         this.score = data.score;
         this.level = data.level;
         this.tiles = data.tiles;
+        console.log("The source was game");
+        if (this.music !== null) {
+            this.music.play();
+        }
         this.gameSaved = false;
         this.cursorBlinkTime = 0;
     }
@@ -41,6 +47,9 @@ export default class GameOver extends Phaser.Scene {
      * @brief Create all elements on the page
      */
     create() {
+        console.log("This was called");
+        this.music = this.sound.add('gameOverMusic');
+        this.music.play();
         this.createGameOverMessage();
         this.createStats();
         this.createButtons();
@@ -132,20 +141,20 @@ export default class GameOver extends Phaser.Scene {
             fontSize: fontSize,
             fontFamily: gameConfig.font,
             color: '#fffffA',
-            backgroundColor: "#333333", // Background color of the button
+            backgroundColor: '#333333', // Background color of the button
             padding: {
                 x: 10, // Horizontal padding
                 y: 10,  // Vertical padding
             },
             border: {
-                color: "#ffffff", // Border color of the button
+                color: '#ffffff', // Border color of the button
                 width: 2,         // Border width
             },
         }
 
-        const newGameString = "New Game";
-        const scoreboardString = "Scoreboard";
-        const saveString = "Save";
+        const newGameString = 'New Game';
+        const scoreboardString = 'Scoreboard';
+        const saveString = 'Save';
 
         const buttonStrings = [newGameString, scoreboardString, saveString];
         const startY = screenHeight * 0.52;
@@ -154,10 +163,10 @@ export default class GameOver extends Phaser.Scene {
         buttonStrings.forEach((buttonString, index) => {
             const button = this.add.text(0, 0, buttonString, buttonStyle)
                 .setInteractive()
-                .on("pointerover", () => {
+                .on('pointerover', () => {
                     this.input.setDefaultCursor('pointer')
                 })
-                .on("pointerout", () => {
+                .on('pointerout', () => {
                     this.input.setDefaultCursor('auto');
                 })
             const callback = () => {
@@ -173,7 +182,7 @@ export default class GameOver extends Phaser.Scene {
                         return this.saveGame();
                 }
             }
-            button.on("pointerup", () => {
+            button.on('pointerup', () => {
                 callback();
             })
             const buttonX = (screenWidth - button.displayWidth) / 2;
@@ -204,11 +213,11 @@ export default class GameOver extends Phaser.Scene {
             fontFamily: gameConfig.font,
             color: '#FFD700'
         }
-        this.nameText = this.add.text(cursorStartX + 5, cursorStartY, "", textStyle)
+        this.nameText = this.add.text(cursorStartX + 5, cursorStartY, '', textStyle)
             .setOrigin(0, 0);
-        
 
-        this.messageText = this.add.text(0, 0, "Enter you username");
+
+        this.messageText = this.add.text(0, 0, 'Enter you username');
         const messageTextX = (screenWidth - this.messageText.displayWidth) / 2;
         const messageTextY = cursorStartY + this.nameText.displayHeight * 1.5;
         this.messageText.x = messageTextX;
@@ -260,7 +269,7 @@ export default class GameOver extends Phaser.Scene {
 
         this.cursorLine.x = newCursorX;
         this.nameText.x = newTextX;
-        this.nameText.text = this.nameText.text.substring(0, this.nameText.text.length -1);
+        this.nameText.text = this.nameText.text.substring(0, this.nameText.text.length - 1);
     }
 
     /**
@@ -274,13 +283,13 @@ export default class GameOver extends Phaser.Scene {
      */
     saveGame() {
         if (this.gameSaved === true) {
-            this.nameSaveMessageOnFailure("Score was already saved");
+            this.nameSaveMessageOnFailure('Score was already saved');
             return;
         }
         const nickname = this.nameText.text;
         const nicknameLength = nickname.length;
         if (nicknameLength === 0) {
-            this.nameSaveMessageOnFailure("Nickname is empty");
+            this.nameSaveMessageOnFailure('Nickname is empty');
             return;
         }
         addScore({
@@ -289,13 +298,13 @@ export default class GameOver extends Phaser.Scene {
             'level': this.level,
             'tiles': this.tiles
         })
-        .then(message => {
-            this.nameSaveMessageOnSuccess(message);
-            this.onGameSaved();
-        })
-        .catch(error => {
-            this.nameSaveMessageOnFailure(error);
-        })
+            .then(message => {
+                this.nameSaveMessageOnSuccess(message);
+                this.onGameSaved();
+            })
+            .catch(error => {
+                this.nameSaveMessageOnFailure(error);
+            })
     }
     /**
      * @brief Called upon successfully adding score to the scoreboard
@@ -304,7 +313,7 @@ export default class GameOver extends Phaser.Scene {
         this.gameSaved = true;
         const saveButton = this.saveButton;
         saveButton.setStyle({
-            color: "#0f0f0f"
+            color: '#0f0f0f'
         })
     }
     /**

@@ -56,17 +56,8 @@ export default class Game extends Phaser.Scene {
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
-        const [windowWidth, windowHeight] = [windowConfig.windowWidth, windowConfig.windowHeight];
-        const [sidebarWidth, sidebarHeight] = [gameConfig.sidebarWidth, gameConfig.sidebarHeight];
-
-        const gameWidth = gameConfig.gameWidth;
-        const gameHeight = gameConfig.gameHeight;
-
-        this.add.rectangle(0, 0, gameWidth, gameHeight, colors.COLOR_BLACK);
-        this.grid.drawGridLines();
-
-        this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_GRAY);
-
+        this.events.on('resume', this.onSceneResumed, this);
+        this.createBackground();
         this.expandShapeBuffer();
         this.setActiveShape();
 
@@ -75,8 +66,24 @@ export default class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
         this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
+
         this.music = this.sound.add('gameMusic');
-        this.music.play();
+        this.music.play({
+            loop: true
+        });
+    }
+    /**
+     * @brief Create background elements, grid lines along with the sidebar
+     */
+    createBackground() {
+        const gameWidth = gameConfig.gameWidth;
+        const gameHeight = gameConfig.gameHeight;
+        const sidebarWidth = gameConfig.sidebarWidth;
+        const sidebarHeight = gameConfig.sidebarHeight;
+        this.add.rectangle(0, 0, gameWidth, gameHeight, colors.COLOR_BLACK);
+        this.grid.drawGridLines();
+
+        this.sidebar = new Sidebar(this, gameWidth, 0, sidebarWidth, sidebarHeight, colors.COLOR_GRAY);
     }
     /**
      * 
@@ -141,6 +148,7 @@ export default class Game extends Phaser.Scene {
                 break;
             case 'esc':
                 this.scene.pause();
+                this.music.pause();
                 this.scene.launch('menu');
                 break;
         }
@@ -368,12 +376,20 @@ export default class Game extends Phaser.Scene {
      */
     checkGameOver() {
         if (this.activeShape.isAtCeiling()) {
+            this.music.stop();
             this.scene.start('game-over', {
-                'score': this.sidebar.score,
-                'level': this.sidebar.level,
-                'tiles': this.sidebar.tilesSpawned
+                score: this.sidebar.score,
+                level: this.sidebar.level,
+                tiles: this.sidebar.tilesSpawned,
+                source: 'game'
             })
         }
+    }
+    /**
+     * @brief Called when the scene is resumed. Resume the music that was stopped when menu was opened
+     */
+    onSceneResumed() {
+        this.music.resume();
     }
 }
 

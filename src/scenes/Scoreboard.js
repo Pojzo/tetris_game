@@ -93,7 +93,7 @@ export default class ScoreboardScene extends Phaser.Scene {
 
         backButton.on('pointerup', () => {
             this.scene.stop();
-            this.scene.launch(this.previousScene);
+            this.scene.resume(this.previousScene);
         })
     }
     createBackground() {
