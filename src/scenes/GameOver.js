@@ -47,8 +47,9 @@ export default class GameOver extends Phaser.Scene {
      * @brief Create all elements on the page
      */
     create() {
-        console.log("This was called");
-        this.music = this.sound.add('gameOverMusic');
+        this.music = this.sound.add('gameOverMusic', {
+            volume: 0.2
+        });
         this.music.play();
         this.createGameOverMessage();
         this.createStats();

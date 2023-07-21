@@ -67,7 +67,9 @@ export default class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
         this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
 
-        this.music = this.sound.add('gameMusic');
+        this.music = this.sound.add('gameMusic', {
+            volume: 0.2
+        });
         if (getMusicOn()) {
             this.music.play({
                 loop: true
