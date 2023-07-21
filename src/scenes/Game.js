@@ -1,6 +1,6 @@
 import * as colors from '../game/colors.js';
 import { pieceColors, pieceStrings } from '../game/shapes.js';
-import { gameConfig, getMusicOn } from '../config/game_config.js';
+import { gameConfig, getMusicOn, getEffectsOn } from '../config/game_config.js';
 
 import Sidebar from '../game/Sidebar.js';
 import { ActiveShape, GhostShape } from '../game/Shape.js';
@@ -52,7 +52,9 @@ export default class Game extends Phaser.Scene {
     preload() {
         this.load.image('keys', '../assets/keys.png');
         this.load.image('esc', '../assets/esc.png');
-        this.load.audio('gameMusic', '../assets/game_music.mp3')
+        this.load.audio('gameMusic', '../assets/game_music.mp3');
+        this.load.audio('shapeDrop', '../assets/shape_drop.mp3');
+        this.load.audio('success', '../assets/success.mp3');
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
     create() {
@@ -66,10 +68,17 @@ export default class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', () => this.handleKeys('space'), this);
         this.input.keyboard.on('keydown-UP', () => this.handleKeys('up'), this);
         this.input.keyboard.on('keydown-ESC', () => this.handleKeys('esc'), this);
+        this.input.keyboard.on('keydown-LEFT', () => this.handleKeys('left'), this);
+        this.input.keyboard.on('keydown-RIGHT', () => this.handleKeys('right'), this);
+        this.input.keyboard.on('keydown-DOWN', () => this.handleKeys('down'), this);
+
+        this.soundEffect = this.sound.add('shapeDrop');
+        this.successEffect = this.sound.add('success');
 
         this.music = this.sound.add('gameMusic', {
-            volume: 0.2
+            volume: 0.1
         });
+
         if (getMusicOn()) {
             this.music.play({
                 loop: true
@@ -256,6 +265,7 @@ export default class Game extends Phaser.Scene {
 
     shapeMoveDown(shape) {
         if (!shape.moveDown(this.grid.array)) {
+            this.playDropEffect();
             this.checkGameOver();
             this.addShapeToGrid(this.activeShape);
             this.updateDifficulty();
@@ -335,6 +345,9 @@ export default class Game extends Phaser.Scene {
     handleTetris() {
         // this means that there is a tetris
         let filledRow = this.grid.getFirstFilledRow();
+        if (filledRow !== null) {
+            this.playSuccessEffect();
+        }
         while (filledRow !== null) {
             this.grid.removeRow(filledRow);
             this.grid.applyGravity(filledRow);
@@ -375,6 +388,21 @@ export default class Game extends Phaser.Scene {
                 'level': currentLevel + 1
             })
             this.gameDelay = 1000 / gameFPS;
+        }
+    }
+    /**
+     * @brief If sound effects are turned on in settings, play the sound effect
+     */
+    playDropEffect() {
+        if (getEffectsOn()) {
+            this.soundEffect.play();
+        }
+    }
+    playSuccessEffect() {
+        if (getEffectsOn()) {
+            this.successEffect.play({
+                volume: 0.5
+            });
         }
     }
 

@@ -1,4 +1,4 @@
-import { gameConfig, getMusicOn, musicOnTrigger } from "../config/game_config.js";
+import { gameConfig, getMusicOn, musicOnTrigger, effectsOnTrigger, getEffectsOn } from "../config/game_config.js";
 import * as colors from '../game/colors.js';
 
 import { calculateXStartTextElementToCenter } from "./GameOver.js";
@@ -9,6 +9,7 @@ export default class MenuScene extends Phaser.Scene {
     }
     preload() {
         this.load.image('checkmark', '../assets/checkmark.png')
+        this.load.image('checkmark2', '../assets/checkmark.png');
     }
     create() {
         this.input.keyboard.on('keydown-ESC', this.resumeGame, this);
@@ -78,7 +79,7 @@ export default class MenuScene extends Phaser.Scene {
         this.scoreBoardButton = scoreBoardButton;
     }
     /**
-     * @brief Create checkbox for music
+     * @brief Create checkbox for music. This could've been done a lot cleaner using a checkbox factory, but whatever.
      */
     createCheckbox() {
         const fontSize = 33;
@@ -92,54 +93,84 @@ export default class MenuScene extends Phaser.Scene {
         const screenHeight = this.cameras.main.height;
 
         const musicText = this.add.text(0, 0, "Music", textStyle).setOrigin(0);
-        const musicTextX = (screenWidth - musicText.displayWidth) * 0.45;
+        const musicTextX = (screenWidth - musicText.displayWidth) * 0.35;
         const musicTextY = (this.scoreBoardButton.y + this.scoreBoardButton.displayHeight * 1.5);
+
+        const soundEffectText = this.add.text(0, 0, "Effects", textStyle).setOrigin(0);
+        const soundEffectX = (screenWidth - soundEffectText.displayWidth) * 0.35;
+        const soundEffectY = musicTextY + musicText.displayHeight * 1.4;
 
         musicText.x = musicTextX;
         musicText.y = musicTextY;
 
+        soundEffectText.x = soundEffectX;
+        soundEffectText.y = soundEffectY;
+
         const checkboxSize = fontSize;
 
-        const checkboxX = musicText.x + musicText.displayWidth + checkboxSize;
-        const checkboxY = musicTextY;
+        let checkboxX = musicText.x + musicText.displayWidth + checkboxSize * 3;
+        let checkboxY = musicTextY;
 
         const musicCheckbox = this.add.rectangle(checkboxX, checkboxY, checkboxSize, checkboxSize)
             .setOrigin(0)
             .setAlpha(0.7)
             .setInteractive()
             .setFillStyle(0xffffff)
-        
-        this.checkboxImage = this.add.image(checkboxX, checkboxY, 'checkmark');
+
+        this.musicCheckboxImage = this.add.image(checkboxX, checkboxY, 'checkmark');
+
+        checkboxY += checkboxSize * 1.4;
+        const soundEffectCheckbox = this.add.rectangle(checkboxX, checkboxY, checkboxSize, checkboxSize)
+            .setOrigin(0)
+            .setAlpha(0.7)
+            .setInteractive()
+            .setFillStyle(0xffffff)
+
+        this.soundEffectCheckboxImage = this.add.image(checkboxX, checkboxY, 'checkmark2');
 
         const desiredWidth = checkboxSize;
         const desiredHeight = checkboxSize;
 
-        const imageWidth = this.checkboxImage.displayWidth;
-        const imageHeight = this.checkboxImage.displayHeight;
+        const imageWidth = this.musicCheckboxImage.displayWidth;
+        const imageHeight = this.musicCheckboxImage.displayHeight;
 
         const scaleX = desiredWidth / imageWidth;
-        const scaleY = desiredHeight  / imageHeight;
+        const scaleY = desiredHeight / imageHeight;
 
-        this.checkboxImage
+        this.musicCheckboxImage
             .setScale(scaleX, scaleY)
             .setOrigin(0);
 
-        this.checkboxImage.setVisible(getMusicOn());
+        this.soundEffectCheckboxImage
+            .setScale(scaleX, scaleY)
+            .setOrigin(0);
+
+        this.musicCheckboxImage.setVisible(getMusicOn());
+        this.soundEffectCheckboxImage.setVisible(getEffectsOn());
+
         musicCheckbox.on('pointerup', () => {
             this.onCheckboxClick('music');
         })
-
+        soundEffectCheckbox.on('pointerup', () => {
+            this.onCheckboxClick('effects');
+        })
     }
+
     /**
      * @brief Called upon clicking a checkbox
      * @param {string} value - Name of the checkbox that was pressed
      */
     onCheckboxClick(value) {
-        console.log("here");
         switch (value) {
             case 'music':
-                this.checkboxImage.setVisible(!this.checkboxImage.visible);
+                this.musicCheckboxImage.setVisible(!this.musicCheckboxImage.visible);
                 musicOnTrigger();
+                break;
+
+            case 'effects':
+                this.soundEffectCheckboxImage.setVisible(!this.soundEffectCheckboxImage.visible);
+                effectsOnTrigger();
+                break;
         }
     }
     /**
